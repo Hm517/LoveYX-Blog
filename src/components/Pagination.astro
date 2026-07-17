@@ -1,0 +1,117 @@
+---
+/** Pagination.astro — 博客分页组件
+ *  上一页/下一页 | 页码列表 | 当前页高亮
+ */
+
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath?: string;
+}
+
+const { currentPage, totalPages, basePath = '/blog' } = Astro.props;
+
+/** 生成页码范围（带省略号） */
+function getPageRange(current: number, total: number): (number | '...')[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages: (number | '...')[] = [];
+
+  if (current <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i);
+    pages.push('...', total);
+  } else if (current >= total - 3) {
+    pages.push(1, '...');
+    for (let i = total - 4; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1, '...');
+    for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+    pages.push('...', total);
+  }
+
+  return pages;
+}
+
+const pageRange = getPageRange(currentPage, totalPages);
+const hasPrev = currentPage > 1;
+const hasNext = currentPage < totalPages;
+
+function pageUrl(page: number) {
+  return page === 1 ? basePath : `${basePath}/page/${page}`;
+}
+---
+
+{totalPages > 1 && (
+  <nav class="flex items-center justify-center gap-2 mt-12" aria-label="分页导航">
+    <!-- Previous -->
+    {hasPrev ? (
+      <a
+        href={pageUrl(currentPage - 1)}
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm text-muted hover:text-text
+               hover:bg-card border border-muted/20 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        上一页
+      </a>
+    ) : (
+      <span
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm text-muted/40
+               border border-muted/10 cursor-not-allowed"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        上一页
+      </span>
+    )}
+
+    <!-- Page Numbers -->
+    <div class="hidden sm:flex items-center gap-1">
+      {pageRange.map((item) =>
+        typeof item === 'number' ? (
+          <a
+            href={pageUrl(item)}
+            class={`w-9 h-9 rounded-lg text-sm flex items-center justify-center transition-colors
+              ${item === currentPage
+                ? 'bg-accent text-white font-medium'
+                : 'text-muted hover:text-text hover:bg-card border border-muted/20'}`}
+          >
+            {item}
+          </a>
+        ) : (
+          <span class="w-9 h-9 flex items-center justify-center text-muted text-sm select-none">
+            ...
+          </span>
+        )
+      )}
+    </div>
+
+    <!-- Next -->
+    {hasNext ? (
+      <a
+        href={pageUrl(currentPage + 1)}
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm text-muted hover:text-text
+               hover:bg-card border border-muted/20 transition-colors"
+      >
+        下一页
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    ) : (
+      <span
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm text-muted/40
+               border border-muted/10 cursor-not-allowed"
+      >
+        下一页
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </span>
+    )}
+  </nav>
+)}

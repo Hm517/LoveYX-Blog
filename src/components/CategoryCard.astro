@@ -1,0 +1,29 @@
+---
+/** CategoryCard.astro — 分类卡片组件
+ *  显示分类名称 | 文章数量 | 链接到 /categories/[category]
+ */
+
+export interface Props {
+  category: string;
+  count: number;
+}
+
+const { category, count } = Astro.props;
+---
+
+<a
+  href={`/categories/${encodeURIComponent(category)}`}
+  class="block group"
+>
+  <div
+    class="bg-card border border-card rounded-xl p-6 transition-all duration-300
+           hover:border-muted/20 hover:shadow-lg hover:-translate-y-0.5"
+  >
+    <h3 class="text-lg font-semibold text-text group-hover:text-accent transition-colors">
+      {category}
+    </h3>
+    <p class="mt-1 text-sm text-muted">
+      {count} 篇文章
+    </p>
+  </div>
+</a>

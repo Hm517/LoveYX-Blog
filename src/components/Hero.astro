@@ -1,0 +1,52 @@
+---
+/** Hero.astro — 首页英雄区
+ *  大标题 | 副标题 | CTA 按钮 | 简洁入场动画
+ */
+---
+
+<section class="min-h-[70vh] flex items-center justify-center px-6 pt-20">
+  <div class="text-center max-w-2xl animate-hero">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text leading-tight">
+      Build Something
+      <span class="text-accent">Interesting.</span>
+    </h1>
+
+    <p class="mt-5 text-lg text-muted leading-relaxed">
+      分享每一次创造，记录每一次成长。
+    </p>
+
+    <div class="mt-10 flex items-center justify-center gap-4">
+      <a
+        href="/blog"
+        class="inline-flex items-center px-6 py-3 rounded-lg bg-accent text-white font-medium text-sm transition-all
+               hover:bg-blue-400 hover:shadow-lg hover:shadow-accent/25 active:scale-95"
+      >
+        查看博客
+      </a>
+      <a
+        href="/about"
+        class="inline-flex items-center px-6 py-3 rounded-lg border border-muted/30 text-muted font-medium text-sm transition-all
+               hover:border-text hover:text-text hover:shadow-sm active:scale-95"
+      >
+        关于我
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /** 简单入场动画 */
+  @keyframes heroFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-hero {
+    animation: heroFadeUp 0.8s ease-out forwards;
+  }
+</style>

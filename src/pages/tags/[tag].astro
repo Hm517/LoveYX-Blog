@@ -1,0 +1,71 @@
+---
+// tags/[tag].astro — 标签详情页
+// 根据标签过滤文章列表
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import BlogList from "../../../components/BlogList.astro";
+import Footer from "../../../components/Footer.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+
+  const tagSet = new Set<string>();
+  posts.forEach((post) => {
+    post.data.tags?.forEach((tag) => tagSet.add(tag));
+  });
+
+  return Array.from(tagSet).map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+
+const allPosts = await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+const filteredPosts = allPosts
+  .filter((post) =>
+    post.data.tags?.some((t) => t.toLowerCase() === tag.toLowerCase())
+  )
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const postItems = filteredPosts.map((post) => {
+  const body = post.body || "";
+  const wordCount = body.replace(/\s/g, "").length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 300));
+  return {
+    title: post.data.title,
+    description: post.data.description,
+    date: post.data.date.toISOString(),
+    updated: post.data.updated?.toISOString(),
+    tags: post.data.tags,
+    category: post.data.category,
+    cover: post.data.cover,
+    readingTime: `${readingTime} 分钟`,
+    slug: post.id,
+  };
+});
+---
+
+<BaseLayout
+  title={`标签: ${tag}`}
+  canonicalURL={new URL(`/tags/${encodeURIComponent(tag)}/`, Astro.site).href}
+>
+  <main class="flex-1 pt-24 pb-12">
+    <div class="max-w-6xl mx-auto px-6">
+      <h1 class="text-3xl font-bold text-text mb-2">
+        <span class="text-accent">#</span>{tag}
+      </h1>
+      <p class="text-muted mb-10">共 {filteredPosts.length} 篇文章</p>
+
+      <BlogList posts={postItems} />
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

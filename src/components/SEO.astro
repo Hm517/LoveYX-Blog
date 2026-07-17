@@ -1,0 +1,70 @@
+---
+/**
+ * SEO 组件
+ * 生成页面 meta 标签，包括 OpenGraph、Twitter Card、Canonical 等
+ */
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalURL?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  updatedTime?: string;
+  tags?: string[];
+}
+
+const {
+  title = "LoveYX",
+  description = "LoveYX - 记录技术、AI、生活与思考。Build Something Interesting.",
+  image = "/images/og-default.png",
+  canonicalURL,
+  type = "website",
+  publishedTime,
+  updatedTime,
+  tags = [],
+} = Astro.props;
+
+const siteURL = Astro.site?.origin || "https://loveyx.fun";
+const fullTitle = title === "LoveYX" ? title : `${title} | LoveYX`;
+const fullImage = image.startsWith("http") ? image : `${siteURL}${image}`;
+const canonical = canonicalURL || Astro.url.href;
+---
+
+<!-- 基础 Meta -->
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+
+<!-- OpenGraph -->
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content="LoveYX" />
+<meta property="og:type" content={type} />
+<meta property="og:image" content={fullImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="zh_CN" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={fullImage} />
+
+<!-- 文章专属 meta -->
+{type === "article" && publishedTime && (
+  <meta property="article:published_time" content={publishedTime} />
+)}
+{type === "article" && updatedTime && (
+  <meta property="article:modified_time" content={updatedTime} />
+)}
+{type === "article" && tags.length > 0 && (
+  tags.map((tag) => <meta property="article:tag" content={tag} />)
+)}
+
+<!-- Robots -->
+<meta name="robots" content="index, follow" />

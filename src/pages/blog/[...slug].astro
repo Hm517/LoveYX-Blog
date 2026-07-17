@@ -1,0 +1,39 @@
+---
+// blog/[...slug].astro — 博客详情页（动态路由）
+// 使用 BlogLayout，内含 TOC、阅读时间、上下篇导航、Giscus 评论
+import { getCollection } from "astro:content";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import TOC from "../../components/TOC.astro";
+import type { CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<"blog"> };
+const { Content, headings } = await post.render();
+
+// 按日期排序获取上下篇
+const allPosts = (await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+})).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const idx = allPosts.findIndex((p) => p.id === post.id);
+const prevEntry = idx < allPosts.length - 1 ? allPosts[idx + 1] : null;
+const nextEntry = idx > 0 ? allPosts[idx - 1] : null;
+---
+
+<BlogLayout entry={post} prevEntry={prevEntry} nextEntry={nextEntry}>
+  <div class="flex gap-10">
+    <div class="flex-1 min-w-0">
+      <Content />
+    </div>
+    <TOC headings={headings} />
+  </div>
+</BlogLayout>

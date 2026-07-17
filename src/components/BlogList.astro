@@ -1,0 +1,36 @@
+---
+/** BlogList.astro — 博客列表组件
+ *  接收 posts 数组，使用 BlogCard 渲染网格列表
+ */
+import BlogCard from './BlogCard.astro';
+
+interface PostItem {
+  title: string;
+  description?: string;
+  date: string;
+  updated?: string;
+  tags?: string[];
+  category?: string;
+  cover?: string;
+  readingTime?: string;
+  slug: string;
+}
+
+export interface Props {
+  posts: PostItem[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 ? (
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {posts.map((post) => (
+      <BlogCard {...post} />
+    ))}
+  </div>
+) : (
+  <div class="text-center py-20">
+    <p class="text-muted text-lg">暂无文章</p>
+  </div>
+)}

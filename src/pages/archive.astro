@@ -1,0 +1,78 @@
+---
+// archive.astro — 归档页
+// 按年份分组展示所有文章，时间线形式
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Footer from "../../components/Footer.astro";
+
+const posts = await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+const sortedPosts = posts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// 按年份分组
+const archiveMap = new Map<number, typeof sortedPosts>();
+sortedPosts.forEach((post) => {
+  const year = post.data.date.getFullYear();
+  if (!archiveMap.has(year)) archiveMap.set(year, []);
+  archiveMap.get(year)!.push(post);
+});
+
+const archives = Array.from(archiveMap.entries()).sort((a, b) => b[0] - a[0]);
+
+function formatDate(d: Date) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "long",
+    day: "numeric",
+  }).format(new Date(d));
+}
+---
+
+<BaseLayout
+  title="归档"
+  canonicalURL={new URL("/archive/", Astro.site).href}
+>
+  <main class="flex-1 pt-24 pb-12">
+    <div class="max-w-3xl mx-auto px-6">
+      <h1 class="text-3xl font-bold text-text mb-2">归档</h1>
+      <p class="text-muted mb-10">共 {sortedPosts.length} 篇文章</p>
+
+      {archives.length > 0 ? (
+        <div class="space-y-12">
+          {archives.map(([year, yearPosts]) => (
+            <section>
+              <h2 class="text-2xl font-bold text-accent mb-6">{year}</h2>
+              <div class="space-y-4">
+                {yearPosts.map((post) => (
+                  <a
+                    href={`/blog/${post.id}/`}
+                    class="group flex items-baseline gap-6 py-3 border-b border-card hover:border-muted/20 transition-colors"
+                  >
+                    <time
+                      class="text-sm text-muted shrink-0 w-20"
+                      datetime={post.data.date.toISOString()}
+                    >
+                      {formatDate(post.data.date)}
+                    </time>
+                    <span class="text-text group-hover:text-accent transition-colors line-clamp-1">
+                      {post.data.title}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20">
+          <p class="text-muted text-lg">暂无文章</p>
+        </div>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

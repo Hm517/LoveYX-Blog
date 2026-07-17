@@ -1,0 +1,146 @@
+---
+// BlogLayout.astro - 博客文章布局
+// 继承 BaseLayout，提供文章容器、自动目录(TOC)、阅读时间、上下篇导航、Giscus 评论
+
+import BaseLayout from "./BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+
+export interface Props {
+  entry: CollectionEntry<"blog">;
+  prevEntry?: CollectionEntry<"blog"> | null;
+  nextEntry?: CollectionEntry<"blog"> | null;
+}
+
+const { entry, prevEntry, nextEntry } = Astro.props;
+const { title, description, date, updated, tags, category, cover } = entry.data;
+
+// 阅读时间估算（中文约 300 字/分钟）
+const body = entry.body || "";
+const wordCount = body.replace(/\s/g, "").length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 300));
+
+// 格式化日期
+const formatDate = (d: Date) =>
+  new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(d));
+
+const pubDate = formatDate(date);
+const updDate = updated ? formatDate(updated) : null;
+---
+
+<BaseLayout
+  title={title}
+  description={description || undefined}
+  ogImage={cover || undefined}
+  canonicalURL={new URL(`/blog/${entry.id}/`, Astro.site).href}
+>
+  <article class="flex-1">
+    <!-- Header -->
+    <header class="container-main py-12 sm:py-16">
+      <!-- Category & Tags -->
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        {category && (
+          <a
+            href={`/categories/${String(category).toLowerCase()}/`}
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition no-underline"
+          >
+            {category}
+          </a>
+        )}
+        {tags?.map((tag: string) => (
+          <a
+            href={`/tags/${tag.toLowerCase()}/`}
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-card text-muted hover:text-text transition no-underline"
+          >
+            #{tag}
+          </a>
+        ))}
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-6">
+        {title}
+      </h1>
+
+      <!-- Meta -->
+      <div class="flex flex-wrap items-center gap-4 text-sm text-muted">
+        <time datetime={date.toISOString()}>发布于 {pubDate}</time>
+        {updDate && <span>更新于 {updDate}</span>}
+        <span class="text-accent/70">{readingTime} 分钟阅读</span>
+      </div>
+
+      <!-- Cover Image -->
+      {cover && (
+        <div class="mt-8 -mx-4 sm:mx-0">
+          <img
+            src={cover}
+            alt={title}
+            class="w-full rounded-xl object-cover"
+            loading="eager"
+          />
+        </div>
+      )}
+    </header>
+
+    <!-- Content -->
+    <div class="container-main pb-12">
+      <div class="prose prose-invert max-w-none
+        prose-headings:text-text prose-headings:font-semibold
+        prose-p:text-text/90 prose-p:leading-relaxed
+        prose-li:text-text/90
+        prose-strong:text-text
+        prose-blockquote:border-l-accent prose-blockquote:text-muted
+        prose-img:rounded-xl prose-img:mx-auto
+        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+        prose-code:text-accent prose-code:bg-card prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+        prose-pre:bg-card prose-pre:border prose-pre:border-white/5">
+        <slot />
+      </div>
+    </div>
+
+    <!-- Prev / Next Navigation -->
+    <nav class="container-main pb-12">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-8">
+        {prevEntry ? (
+          <a
+            href={`/blog/${prevEntry.id}/`}
+            class="group p-4 rounded-xl bg-card hover:bg-card/80 transition no-underline"
+          >
+            <span class="text-xs text-muted">上一篇</span>
+            <p class="mt-1 text-sm font-medium text-text group-hover:text-accent transition line-clamp-2">
+              {prevEntry.data.title}
+            </p>
+          </a>
+        ) : (
+          <div />
+        )}
+        {nextEntry ? (
+          <a
+            href={`/blog/${nextEntry.id}/`}
+            class="group p-4 rounded-xl bg-card hover:bg-card/80 transition no-underline text-right"
+          >
+            <span class="text-xs text-muted">下一篇</span>
+            <p class="mt-1 text-sm font-medium text-text group-hover:text-accent transition line-clamp-2">
+              {nextEntry.data.title}
+            </p>
+          </a>
+        ) : (
+          <div />
+        )}
+      </div>
+    </nav>
+
+    <!-- Giscus Comments -->
+    <div class="container-main pb-16">
+      <div class="border-t border-white/5 pt-8">
+        <!-- Giscus 评论占位 — 部署后填入你的 repo 信息 -->
+        <p class="text-center text-sm text-muted">
+          评论功能（Giscus）— 部署后配置 GitHub Discussions 即可启用
+        </p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

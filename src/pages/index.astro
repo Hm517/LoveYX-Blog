@@ -1,0 +1,57 @@
+---
+// index.astro — 首页
+// Hero + 最新 6 篇博客文章
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import BlogList from "../components/BlogList.astro";
+import Footer from "../components/Footer.astro";
+
+const allPosts = await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+const latestPosts = allPosts
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 6)
+  .map((post) => {
+    const body = post.body || "";
+    const wordCount = body.replace(/\s/g, "").length;
+    const readingTime = Math.max(1, Math.ceil(wordCount / 300));
+    return {
+      title: post.data.title,
+      description: post.data.description,
+      date: post.data.date.toISOString(),
+      updated: post.data.updated?.toISOString(),
+      tags: post.data.tags,
+      category: post.data.category,
+      cover: post.data.cover,
+      readingTime: `${readingTime} 分钟`,
+      slug: post.id,
+    };
+  });
+---
+
+<BaseLayout
+  title="LoveYX - 记录技术、AI、生活与思考"
+  canonicalURL={new URL("/", Astro.site).href}
+>
+  <main class="flex-1">
+    <Hero />
+
+    <section class="max-w-6xl mx-auto px-6 pb-20">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold text-text">最新文章</h2>
+        <a
+          href="/blog"
+          class="text-sm text-accent hover:underline"
+        >
+          查看全部 &rarr;
+        </a>
+      </div>
+      <BlogList posts={latestPosts} />
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+/** TagBadge.astro — 标签徽章组件
+ *  链接到 /tags/[tag] | 可选计数 | 可自定义尺寸
+ */
+
+export interface Props {
+  tag: string;
+  count?: number;
+  size?: 'sm' | 'md';
+  active?: boolean;
+}
+
+const { tag, count, size = 'md', active = false } = Astro.props;
+
+const sizeClasses = {
+  sm: 'text-xs px-2 py-0.5',
+  md: 'text-sm px-3 py-1',
+}[size];
+
+const activeClasses = active
+  ? 'bg-accent/20 text-accent border-accent/30'
+  : 'bg-bg text-muted border-muted/20 hover:text-text hover:border-muted/40';
+---
+
+<a
+  href={`/tags/${encodeURIComponent(tag)}`}
+  class={`inline-flex items-center gap-1.5 rounded-full border transition-colors ${sizeClasses} ${activeClasses}`}
+>
+  <span>#{tag}</span>
+  {count !== undefined && (
+    <span class="text-xs opacity-60">{count}</span>
+  )}
+</a>

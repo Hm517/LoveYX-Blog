@@ -1,0 +1,148 @@
+---
+/** SearchModal.astro — 本地全文搜索弹窗
+ *  基于预构建的 search-index.json 实现客户端搜索
+ *  Ctrl/Cmd+K 快捷键唤醒 | 模糊搜索 | 中文支持
+ */
+---
+
+<!-- Search Trigger Button (hidden, activated by keyboard) -->
+<button
+  id="search-trigger"
+  class="hidden"
+  aria-label="打开搜索"
+></button>
+
+<!-- Modal Overlay -->
+<div
+  id="search-overlay"
+  class="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm hidden items-start justify-center pt-[15vh]"
+>
+  <div
+    class="w-full max-w-xl bg-card border border-muted/20 rounded-xl shadow-2xl overflow-hidden mx-4"
+  >
+    <!-- Search Input -->
+    <div class="flex items-center gap-3 px-4 py-3 border-b border-muted/10">
+      <svg class="w-5 h-5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/>
+      </svg>
+      <input
+        type="text"
+        id="search-input"
+        class="flex-1 bg-transparent text-text placeholder-muted text-sm outline-none border-none"
+        placeholder="搜索文章..."
+        autocomplete="off"
+      />
+      <kbd class="hidden sm:inline-block text-xs text-muted bg-bg rounded px-2 py-1 border border-muted/20">
+        ESC
+      </kbd>
+    </div>
+
+    <!-- Results -->
+    <div id="search-results" class="max-h-80 overflow-y-auto p-2">
+      <p class="text-center text-muted text-sm py-8">输入关键词开始搜索</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 py-2 border-t border-muted/10 flex items-center justify-between text-xs text-muted">
+      <span>本地全文搜索</span>
+      <span>使用 <kbd class="bg-bg rounded px-1 border border-muted/20">Ctrl</kbd>+<kbd class="bg-bg rounded px-1 border border-muted/20">K</kbd> 打开</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  /** 搜索模态框逻辑 */
+  const overlay = document.getElementById('search-overlay')!;
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const results = document.getElementById('search-results')!;
+
+  let searchIndex: Array<{
+    title: string;
+    description: string;
+    slug: string;
+    category: string;
+    tags: string[];
+    content: string;
+  }> = [];
+
+  /** 加载搜索索引 */
+  async function loadIndex() {
+    try {
+      const res = await fetch('/search-index.json');
+      if (res.ok) searchIndex = await res.json();
+    } catch {
+      searchIndex = [];
+    }
+  }
+
+  function openSearch() {
+    overlay.classList.remove('hidden');
+    input.focus();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSearch() {
+    overlay.classList.add('hidden');
+    input.value = '';
+    renderEmpty();
+    document.body.style.overflow = '';
+  }
+
+  function renderEmpty() {
+    results.innerHTML = '<p class="text-center text-muted text-sm py-8">输入关键词开始搜索</p>';
+  }
+
+  function renderResults(query: string) {
+    if (!query.trim()) return renderEmpty();
+    const q = query.toLowerCase();
+    const matched = searchIndex.filter((item) => {
+      const text = `${item.title} ${item.description} ${item.category} ${item.tags.join(' ')} ${item.content}`.toLowerCase();
+      return text.includes(q);
+    });
+
+    if (matched.length === 0) {
+      results.innerHTML = '<p class="text-center text-muted text-sm py-8">未找到匹配结果</p>';
+      return;
+    }
+
+    results.innerHTML = matched
+      .slice(0, 20)
+      .map(
+        (item) => `
+        <a href="/blog/${item.slug}" class="block p-3 rounded-lg hover:bg-bg transition-colors group"
+           onclick="document.getElementById('search-overlay')!.classList.add('hidden'); document.body.style.overflow=''">
+          <div class="flex items-center gap-2">
+            ${item.category ? `<span class="text-xs text-accent bg-accent/10 rounded px-2 py-0.5 shrink-0">${item.category}</span>` : ''}
+            <span class="text-sm font-medium text-text group-hover:text-accent transition-colors truncate">${item.title}</span>
+          </div>
+          ${item.description ? `<p class="mt-1 text-xs text-muted line-clamp-2">${item.description}</p>` : ''}
+        </a>`
+      )
+      .join('');
+  }
+
+  input.addEventListener('input', () => renderResults(input.value));
+
+  /** 键盘快捷键 */
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+      closeSearch();
+    }
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSearch();
+  });
+
+  /** 首次打开时加载索引 */
+  document.addEventListener('keydown', function preload(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      loadIndex();
+      document.removeEventListener('keydown', preload);
+    }
+  }, { once: false });
+</script>

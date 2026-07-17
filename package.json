@@ -1,0 +1,25 @@
+{
+  "name": "loveyx-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "LoveYX Blog - 记录技术、AI、生活与思考",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^5.4.0",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.3.0",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.7.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
+    "tailwindcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "shiki": "^3.2.0"
+  }
+}

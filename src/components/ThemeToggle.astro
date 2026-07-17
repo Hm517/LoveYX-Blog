@@ -1,0 +1,94 @@
+---
+/** ThemeToggle.astro — 深色/浅色模式切换按钮
+ *  Sun/Moon SVG 图标 | localStorage 持久化 | FOUC 防护
+ */
+---
+
+<button
+  id="theme-toggle"
+  class="p-1.5 rounded-lg text-muted hover:text-text hover:bg-bg transition-colors"
+  aria-label="切换主题"
+>
+  <!-- Sun Icon (浅色模式 → 显示在深色模式下，提示可切换到浅色) -->
+  <svg
+    id="sun-icon"
+    class="w-5 h-5 hidden"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+    />
+  </svg>
+
+  <!-- Moon Icon (深色模式 → 显示在浅色模式下，提示可切换到深色) -->
+  <svg
+    id="moon-icon"
+    class="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+    />
+  </svg>
+</button>
+
+<script>
+  /**
+   * 主题切换逻辑
+   * - 无本地存储时跟随系统偏好
+   * - 有存储则使用存储值
+   * - 切换时更新 html class + localStorage
+   */
+
+  function getTheme(): 'dark' | 'light' {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || stored === 'light') return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme: 'dark' | 'light') {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
+
+    const sun = document.getElementById('sun-icon')!;
+    const moon = document.getElementById('moon-icon')!;
+
+    if (theme === 'dark') {
+      sun.classList.remove('hidden');
+      moon.classList.add('hidden');
+    } else {
+      sun.classList.add('hidden');
+      moon.classList.remove('hidden');
+    }
+  }
+
+  /** 初始化：同步当前主题下的图标状态 */
+  const currentTheme = getTheme();
+  applyTheme(currentTheme);
+
+  /** 切换按钮点击 */
+  document.getElementById('theme-toggle')!.addEventListener('click', () => {
+    const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+  });
+
+  /** 系统主题变化时同步（无手动存储时生效） */
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+</script>
