@@ -1,71 +1,42 @@
 ---
-// index.astro — 首页
-// Hero + 最新 6 篇博客文章
-import { getCollection } from "astro:content";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import BlogList from "../components/BlogList.astro";
-import Footer from "../components/Footer.astro";
+/** index.astro — home page */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import BlogList from '../components/BlogList.astro';
+import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
+const posts = await getCollection('blog').then((all) =>
+  all.filter((p) => !p.data.draft).sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 6)
+);
 
-const latestPosts = allPosts
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 6)
-  .map((post) => {
-    const body = post.body || "";
-    const wordCount = body.replace(/\s/g, "").length;
-    const readingTime = Math.max(1, Math.ceil(wordCount / 300));
-    return {
-      title: post.data.title,
-      description: post.data.description,
-      date: post.data.date.toISOString(),
-      updated: post.data.updated?.toISOString(),
-      tags: post.data.tags,
-      category: post.data.category,
-      cover: post.data.cover,
-      readingTime: `${readingTime} 分钟`,
-      slug: post.id,
-    };
-  });
+const postItems = posts.map((p) => ({
+  title: p.data.title,
+  description: p.data.description,
+  date: p.data.date.toISOString(),
+  tags: p.data.tags,
+  category: p.data.category,
+  cover: p.data.cover,
+  readingTime: p.data.readingTime,
+  slug: p.slug,
+}));
 ---
 
-<BaseLayout
-  title="LoveYX - 记录技术、AI、生活与思考"
-  canonicalURL={new URL("/", Astro.site).href}
->
-  <main class="flex-1">
-    <Hero />
+<BaseLayout title="LoveYX" description="探索技术前沿，记录创造历程。在代码与文字之间，发现无限可能。">
+  <Hero />
 
-    <section class="max-w-6xl mx-auto px-6 pb-24">
-      <div class="flex items-end justify-between mb-10">
-        <div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">
-            最新文章
-          </h2>
-          <p class="mt-2 text-sm" style="color: var(--color-muted)">
-            探索技术、AI 与生活的思考
-          </p>
-        </div>
-        <a
-          href="/blog"
-          class="group inline-flex items-center gap-2 text-sm font-semibold
-                 transition-all duration-300 hover:gap-3 hover:no-underline"
-          style="color: var(--color-accent)"
-        >
-          查看全部
-          <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-               fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-          </svg>
-        </a>
+  <section class="max-w-6xl mx-auto px-5 pt-4 pb-20">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text)">最新文章</h2>
+        <p class="text-sm mt-1" style="color: var(--color-muted)">近期创作的精选内容</p>
       </div>
-      <BlogList posts={latestPosts} />
-    </section>
-  </main>
-
-  <Footer />
+      <a href="/blog"
+         class="inline-flex items-center gap-1.5 text-sm font-medium
+                transition-all duration-300 hover:gap-2 hover:no-underline"
+         style="color: var(--color-accent)">
+        查看全部 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+    </div>
+    <BlogList posts={postItems} />
+  </section>
 </BaseLayout>

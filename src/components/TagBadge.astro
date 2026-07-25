@@ -1,8 +1,5 @@
 ---
-/** TagBadge.astro — 标签徽章组件
- *  链接到 /tags/[tag] | 可选计数 | 可自定义尺寸
- */
-
+/** TagBadge.astro — tag badge component */
 export interface Props {
   tag: string;
   count?: number;
@@ -11,29 +8,22 @@ export interface Props {
 }
 
 const { tag, count, size = 'md', active = false } = Astro.props;
-
 const sizeClasses = {
-  sm: 'text-xs px-2.5 py-1 gap-1',
-  md: 'text-sm px-3.5 py-1.5 gap-1.5',
-  lg: 'text-base px-4 py-2 gap-2',
+  sm: 'text-xs px-2 py-0.5 gap-1',
+  md: 'text-sm px-3 py-1 gap-1.5',
+  lg: 'text-base px-4 py-1.5 gap-2',
 }[size];
 ---
 
-<a
-  href={`/tags/${encodeURIComponent(tag)}`}
-  class={`inline-flex items-center rounded-full font-medium
-          transition-all duration-300 hover:scale-105 hover:shadow-md hover:no-underline
-          ${sizeClasses}`}
-  style={active
-    ? `color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);`
-    : `color: var(--color-muted); background: var(--color-surface); border: 1px solid var(--color-border);`}
->
-  <span class="opacity-70">#</span>
-  <span>{tag}</span>
+<a href={`/tags/${encodeURIComponent(tag)}`}
+   class={`inline-flex items-center rounded-full font-medium
+           transition-all duration-300 hover:scale-105 hover:shadow-md hover:no-underline
+           ${sizeClasses}`}
+   style={active
+     ? `color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);`
+     : `color: var(--color-muted); background: var(--color-surface); border: 1px solid var(--color-border);`}>
+  <span class="opacity-60">#</span><span>{tag}</span>
   {count !== undefined && (
-    <span class="rounded-full px-1.5 py-0.5 text-xs leading-none"
-          style="background: var(--color-bg); opacity: 0.7;">
-      {count}
-    </span>
+    <span class="rounded-full px-1.5 py-0.5 text-xs leading-none" style="background: var(--color-bg); opacity: 0.65;">{count}</span>
   )}
 </a>

@@ -1,63 +1,30 @@
 ---
-// tags/index.astro — 标签总览页
-// 统计所有标签及文章数，标签云形式展示
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import TagBadge from "../../components/TagBadge.astro";
-import Footer from "../../components/Footer.astro";
+/** tags/index.astro — all tags */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagBadge from '../../components/TagBadge.astro';
+import { getCollection } from 'astro:content';
 
-const posts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
-
-// 统计标签
+const posts = await getCollection('blog').then((all) => all.filter((p) => !p.data.draft));
 const tagMap = new Map<string, number>();
-posts.forEach((post) => {
-  post.data.tags?.forEach((tag) => {
-    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-  });
-});
-
-const tags = Array.from(tagMap.entries())
-  .sort((a, b) => b[1] - a[1]);
+posts.forEach((p) => { p.data.tags?.forEach((t: string) => tagMap.set(t, (tagMap.get(t) || 0) + 1)); });
+const tags = Array.from(tagMap.entries()).sort((a, b) => b[1] - a[1]);
 ---
 
-<BaseLayout
-  title="标签"
-  canonicalURL={new URL("/tags/", Astro.site).href}
->
-  <main class="flex-1 pt-24 pb-12">
-    <div class="max-w-6xl mx-auto px-6">
-      <header class="mb-12">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" style="color: var(--color-accent)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
-            </svg>
-          </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">标签</h1>
-        </div>
-        <p class="text-sm" style="color: var(--color-muted)">共 {tags.length} 个标签</p>
-      </header>
+<BaseLayout title="标签" description="LoveYX 博客标签索引，按标签浏览文章。">
+  <div class="max-w-3xl mx-auto px-5 pt-12 pb-20">
+    <header class="mb-12 animate-fade-up">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center"
+              style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+        </span>
+        <h1 class="text-2xl font-bold" style="color: var(--color-text)">标签</h1>
+      </div>
+      <p class="text-sm ml-11" style="color: var(--color-muted)">共 {tags.length} 个标签</p>
+    </header>
 
-      {tags.length > 0 ? (
-        <div class="flex flex-wrap gap-3">
-          {tags.map(([tag, count]) => (
-            <TagBadge tag={tag} count={count} size="md" />
-          ))}
-        </div>
-      ) : (
-        <div class="text-center py-20">
-          <p class="text-muted text-lg">暂无标签</p>
-        </div>
-      )}
+    <div class="flex flex-wrap gap-2 stagger-children">
+      {tags.map(([tag, count]) => (<TagBadge tag={tag} count={count} size="lg" />))}
     </div>
-  </main>
-
-  <Footer />
+  </div>
 </BaseLayout>

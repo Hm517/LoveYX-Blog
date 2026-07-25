@@ -1,91 +1,41 @@
 ---
-// BaseLayout.astro - 基础布局组件
-// 提供 HTML head、SEO meta、深色模式切换、Cloudflare Web Analytics
+/** BaseLayout.astro — base page wrapper */
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 export interface Props {
-  title?: string;
+  title: string;
   description?: string;
   ogImage?: string;
-  canonicalURL?: string;
+  noIndex?: boolean;
 }
 
-const {
-  title,
-  description = "记录技术、AI、生活与思考",
-  ogImage = "/images/og-default.png",
-  canonicalURL,
-} = Astro.props;
-
-const siteTitle = title ? `${title} | LoveYX` : "LoveYX - 记录技术、AI、生活与思考";
-const pageUrl = canonicalURL || Astro.url.href;
+const { title, description, ogImage, noIndex } = Astro.props;
+const siteTitle = 'LoveYX';
+const fullTitle = title === siteTitle ? title : `${title} — ${siteTitle}`;
 ---
 
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <!-- Primary Meta -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#09090B" />
-
-    <!-- Title -->
-    <title>{siteTitle}</title>
-
-    <!-- OpenGraph -->
-    <meta property="og:title" content={siteTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={pageUrl} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:site_name" content="LoveYX" />
-    <meta property="og:locale" content="zh_CN" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={siteTitle} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-
-    <!-- Canonical -->
-    <link rel="canonical" href={pageUrl} />
-
-    <!-- RSS -->
-    <link rel="alternate" type="application/rss+xml" title="LoveYX Blog RSS" href="/rss.xml" />
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Global Styles -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
-  </head>
-
-  <body>
-    <!-- 深色模式 class 切换脚本（内联，避免闪烁） -->
-    <script is:inline>
-      (function () {
-        const stored = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (stored === "dark" || (!stored && prefersDark)) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.add("light");
-        }
-      })();
-    </script>
-
-    <div class="min-h-screen flex flex-col">
-      <slot />
-    </div>
-
-    <!-- Cloudflare Web Analytics -->
-    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon='{"token": "YOUR_CF_ANALYTICS_TOKEN"}'>
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description || 'LoveYX — 探索技术前沿，记录创造历程'} />
+  {noIndex && <meta name="robots" content="noindex" />}
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description || 'LoveYX — 探索技术前沿，记录创造历程'} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="LoveYX" />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  <link rel="sitemap" href="/sitemap-index.xml" />
+</head>
+<body class="min-h-screen flex flex-col">
+  <Header />
+  <main class="flex-1 pt-14">
+    <slot />
+  </main>
+  <Footer />
+</body>
 </html>

@@ -1,90 +1,45 @@
 ---
-// tags/[tag].astro — 标签详情页
-// 根据标签过滤文章列表
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import BlogList from "../../components/BlogList.astro";
-import Footer from "../../components/Footer.astro";
+/** tags/[tag].astro — posts by tag */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogList from '../../components/BlogList.astro';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => {
-    return import.meta.env.PROD ? !data.draft : true;
-  });
-
+  const posts = await getCollection('blog');
   const tagSet = new Set<string>();
-  posts.forEach((post) => {
-    post.data.tags?.forEach((tag) => tagSet.add(tag));
-  });
-
-  return Array.from(tagSet).map((tag) => ({
-    params: { tag },
-    props: { tag },
-  }));
+  posts.filter((p) => !p.data.draft).forEach((p) => { p.data.tags?.forEach((t: string) => tagSet.add(t)); });
+  return Array.from(tagSet).map((tag) => ({ params: { tag }, props: {} }));
 }
 
-const { tag } = Astro.props;
-
-const allPosts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
-
-const filteredPosts = allPosts
-  .filter((post) =>
-    post.data.tags?.some((t) => t.toLowerCase() === tag.toLowerCase())
-  )
+const { tag } = Astro.params;
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft && p.data.tags?.includes(tag))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const postItems = filteredPosts.map((post) => {
-  const body = post.body || "";
-  const wordCount = body.replace(/\s/g, "").length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 300));
-  return {
-    title: post.data.title,
-    description: post.data.description,
-    date: post.data.date.toISOString(),
-    updated: post.data.updated?.toISOString(),
-    tags: post.data.tags,
-    category: post.data.category,
-    cover: post.data.cover,
-    readingTime: `${readingTime} 分钟`,
-    slug: post.id,
-  };
-});
+const postItems = posts.map((p) => ({
+  title: p.data.title, description: p.data.description, date: p.data.date.toISOString(),
+  tags: p.data.tags, category: p.data.category, cover: p.data.cover,
+  readingTime: p.data.readingTime, slug: p.slug,
+}));
 ---
 
-<BaseLayout
-  title={`标签: ${tag}`}
-  canonicalURL={new URL(`/tags/${encodeURIComponent(tag)}/`, Astro.site).href}
->
-  <main class="flex-1 pt-24 pb-12">
-    <div class="max-w-6xl mx-auto px-6">
-      <header class="mb-12">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" style="color: var(--color-accent)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
-            </svg>
-          </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">
-            <span style="color: var(--color-accent)">#</span>{tag}
-          </h1>
-        </div>
-        <p class="text-sm" style="color: var(--color-muted)">
-          共 {filteredPosts.length} 篇文章
-          <a href="/tags" class="ml-3 text-accent opacity-70 hover:opacity-100 transition-opacity hover:no-underline no-underline">
-            &larr; 所有标签
-          </a>
-        </p>
-      </header>
-
-      <BlogList posts={postItems} />
-    </div>
-  </main>
-
-  <Footer />
+<BaseLayout title={`标签: ${tag}`} description={`查看标签为「${tag}」的所有文章。`}>
+  <div class="max-w-6xl mx-auto px-5 pt-12 pb-20">
+    <header class="mb-12 animate-fade-up">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center"
+              style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/></svg>
+        </span>
+        <h1 class="text-2xl font-bold" style="color: var(--color-text)">
+          标签: <span style="color: var(--color-accent)">#{tag}</span>
+        </h1>
+      </div>
+      <p class="text-sm ml-11" style="color: var(--color-muted)">共 {posts.length} 篇文章</p>
+      <div class="mt-5 ml-11">
+        <a href="/tags" class="text-sm transition-colors hover:text-accent hover:no-underline" style="color: var(--color-muted)">&larr; 所有标签</a>
+      </div>
+    </header>
+    <BlogList posts={postItems} />
+  </div>
 </BaseLayout>

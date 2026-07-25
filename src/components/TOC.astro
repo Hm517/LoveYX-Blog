@@ -1,48 +1,25 @@
 ---
-/** TOC.astro — 文章目录组件
- *  接收 headings 数组 | 层级缩进 | IntersectionObserver 滚动高亮
- */
-
-interface Heading {
-  depth: number;
-  text: string;
-  slug: string;
-}
-
-export interface Props {
-  headings: Heading[];
-}
-
+/** TOC.astro — article table of contents */
+interface Heading { depth: number; text: string; slug: string; }
+export interface Props { headings: Heading[]; }
 const { headings } = Astro.props;
-
-/** 过滤仅保留 h2/h3 */
 const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
 {tocHeadings.length > 0 && (
-  <nav class="hidden xl:block sticky top-24 w-full max-w-[240px] ml-8">
-    <div class="flex items-center gap-2 mb-4">
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-           viewBox="0 0 24 24" style="color: var(--color-accent)">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+  <nav class="hidden xl:block sticky top-24 w-full max-w-[220px] ml-6">
+    <div class="flex items-center gap-2 mb-3.5">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
       </svg>
-      <h4 class="text-xs font-semibold uppercase tracking-wider"
-          style="color: var(--color-muted)">
-        目录
-      </h4>
+      <h4 class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-muted)">目录</h4>
     </div>
-
-    <ul class="space-y-0.5 text-sm" id="toc-list"
-        style="border-left: 2px solid var(--color-border); padding-left: 1rem;">
+    <ul class="space-y-0.5 text-sm" id="toc-list" style="border-left: 2px solid var(--color-border); padding-left: 0.875rem;">
       {tocHeadings.map((h) => (
         <li>
-          <a
-            href={`#${h.slug}`}
-            data-toc-slug={h.slug}
-            class="block rounded-lg transition-all duration-200 text-xs sm:text-sm py-1.5 truncate hover:no-underline"
-            style={`padding-left: ${(h.depth - 2) * 14}px; color: var(--color-muted);`}
-          >
+          <a href={`#${h.slug}`} data-toc-slug={h.slug}
+             class="block rounded-lg transition-all duration-200 text-xs py-1.5 truncate hover:no-underline"
+             style={`padding-left: ${(h.depth - 2) * 12}px; color: var(--color-muted);`}>
             {h.text}
           </a>
         </li>
@@ -52,16 +29,11 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 )}
 
 <script>
-  /** IntersectionObserver 高亮当前可见章节 */
   if (typeof window !== 'undefined') {
     const tocLinks = document.querySelectorAll<HTMLAnchorElement>('[data-toc-slug]');
-
     if (tocLinks.length > 0) {
       const headingIds = Array.from(tocLinks).map((a) => a.dataset.tocSlug!);
-      const headingElements = headingIds
-        .map((id) => document.getElementById(id))
-        .filter(Boolean) as HTMLElement[];
-
+      const headingElements = headingIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -81,7 +53,6 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         },
         { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
       );
-
       headingElements.forEach((el) => observer.observe(el));
     }
   }

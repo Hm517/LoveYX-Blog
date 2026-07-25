@@ -1,68 +1,30 @@
 ---
-// categories/index.astro — 分类总览页
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import CategoryCard from "../../components/CategoryCard.astro";
-import Footer from "../../components/Footer.astro";
+/** categories/index.astro — all categories */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import { getCollection } from 'astro:content';
 
-const posts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
-
-// 统计分类
+const posts = await getCollection('blog').then((all) => all.filter((p) => !p.data.draft));
 const catMap = new Map<string, number>();
-posts.forEach((post) => {
-  const cat = post.data.category;
-  if (cat) catMap.set(cat, (catMap.get(cat) || 0) + 1);
-});
-
-const categories = Array.from(catMap.entries())
-  .sort((a, b) => b[1] - a[1]);
+posts.forEach((p) => { if (p.data.category) catMap.set(p.data.category, (catMap.get(p.data.category) || 0) + 1); });
+const categories = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
 ---
 
-<BaseLayout
-  title="分类"
-  canonicalURL={new URL("/categories/", Astro.site).href}
->
-  <main class="flex-1 pt-24 pb-12">
-    <div class="max-w-6xl mx-auto px-6">
-      <header class="mb-12">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" style="color: var(--color-accent)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
-            </svg>
-          </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">分类</h1>
-        </div>
-        <p class="text-sm" style="color: var(--color-muted)">共 {categories.length} 个分类</p>
-      </header>
+<BaseLayout title="分类" description="LoveYX 博客文章分类索引。">
+  <div class="max-w-6xl mx-auto px-5 pt-12 pb-20">
+    <header class="mb-12 animate-fade-up">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center"
+              style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+        </span>
+        <h1 class="text-2xl font-bold" style="color: var(--color-text)">分类</h1>
+      </div>
+      <p class="text-sm ml-11" style="color: var(--color-muted)">共 {categories.length} 个分类</p>
+    </header>
 
-      {categories.length > 0 ? (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map(([category, count]) => (
-            <CategoryCard category={category} count={count} />
-          ))}
-        </div>
-      ) : (
-        <div class="text-center py-20">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-               style="background: var(--color-surface); border: 1px solid var(--color-border);">
-            <svg class="w-8 h-8 opacity-30" fill="none" stroke="currentColor"
-                 stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--color-muted)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
-            </svg>
-          </div>
-          <p class="text-lg" style="color: var(--color-muted)">暂无分类</p>
-        </div>
-      )}
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
+      {categories.map(([cat, count]) => (<CategoryCard category={cat} count={count} />))}
     </div>
-  </main>
-
-  <Footer />
+  </div>
 </BaseLayout>

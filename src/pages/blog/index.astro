@@ -1,56 +1,38 @@
 ---
-// blog/index.astro — 博客列表页
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import BlogList from "../../components/BlogList.astro";
-import Footer from "../../components/Footer.astro";
+/** blog/index.astro — blog list */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogList from '../../components/BlogList.astro';
+import { getCollection } from 'astro:content';
 
-const posts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
-});
+const allPosts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const sortedPosts = posts.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
-
-const postItems = sortedPosts.map((post) => {
-  const body = post.body || "";
-  const wordCount = body.replace(/\s/g, "").length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 300));
-  return {
-    title: post.data.title,
-    description: post.data.description,
-    date: post.data.date.toISOString(),
-    updated: post.data.updated?.toISOString(),
-    tags: post.data.tags,
-    category: post.data.category,
-    cover: post.data.cover,
-    readingTime: `${readingTime} 分钟`,
-    slug: post.id,
-  };
-});
+const postItems = allPosts.map((p) => ({
+  title: p.data.title,
+  description: p.data.description,
+  date: p.data.date.toISOString(),
+  tags: p.data.tags,
+  category: p.data.category,
+  cover: p.data.cover,
+  readingTime: p.data.readingTime,
+  slug: p.slug,
+}));
 ---
 
-<BaseLayout title="博客">
-  <main class="flex-1 pt-24 pb-12">
-    <div class="max-w-6xl mx-auto px-6">
-      <header class="mb-12">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" style="color: var(--color-accent)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
-            </svg>
-          </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">博客</h1>
-        </div>
-        <p class="text-sm" style="color: var(--color-muted)">共 {sortedPosts.length} 篇文章</p>
-      </header>
-      <BlogList posts={postItems} />
-    </div>
-  </main>
-  <Footer />
+<BaseLayout title="博客" description="LoveYX 博客文章列表。探索技术、AI 与生活的深度思考。">
+  <div class="max-w-6xl mx-auto px-5 pt-12 pb-20">
+    <header class="mb-12 animate-fade-up">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center"
+              style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+        </span>
+        <h1 class="text-2xl font-bold" style="color: var(--color-text)">全部文章</h1>
+      </div>
+      <p class="text-sm ml-11" style="color: var(--color-muted)">共 {allPosts.length} 篇文章</p>
+    </header>
+
+    <BlogList posts={postItems} />
+  </div>
 </BaseLayout>

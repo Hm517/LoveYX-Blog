@@ -1,112 +1,61 @@
 ---
-// archive.astro — 归档页
-import { getCollection } from "astro:content";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Footer from "../components/Footer.astro";
+/** archive.astro — archive page grouped by year */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
-const posts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true;
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const grouped: Record<number, { title: string; date: string; slug: string; category?: string }[]> = {};
+posts.forEach((p) => {
+  const y = p.data.date.getFullYear();
+  if (!grouped[y]) grouped[y] = [];
+  grouped[y].push({ title: p.data.title, date: p.data.date.toISOString(), slug: p.slug, category: p.data.category });
 });
-
-const sortedPosts = posts.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
-);
-
-// 按年份分组
-const archiveMap = new Map<number, typeof sortedPosts>();
-sortedPosts.forEach((post) => {
-  const year = post.data.date.getFullYear();
-  if (!archiveMap.has(year)) archiveMap.set(year, []);
-  archiveMap.get(year)!.push(post);
-});
-
-const archives = Array.from(archiveMap.entries()).sort((a, b) => b[0] - a[0]);
-
-function formatDate(d: Date) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "long",
-    day: "numeric",
-  }).format(new Date(d));
-}
+const years = Object.keys(grouped).map(Number).sort((a, b) => b - a);
 ---
 
-<BaseLayout
-  title="归档"
-  canonicalURL={new URL("/archive/", Astro.site).href}
->
-  <main class="flex-1 pt-24 pb-12">
-    <div class="max-w-3xl mx-auto px-6">
-      <header class="mb-12">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" style="color: var(--color-accent)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
-            </svg>
-          </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">归档</h1>
-        </div>
-        <p class="text-sm" style="color: var(--color-muted)">
-          共 {sortedPosts.length} 篇文章
-        </p>
-      </header>
+<BaseLayout title="归档" description="LoveYX 博客文章归档。按年份浏览全部文章。">
+  <div class="max-w-3xl mx-auto px-5 pt-12 pb-20">
+    <header class="mb-12 animate-fade-up">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-8 h-8 rounded-lg flex items-center justify-center"
+              style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-accent)"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+        </span>
+        <h1 class="text-2xl font-bold" style="color: var(--color-text)">文章归档</h1>
+      </div>
+      <p class="text-sm ml-11" style="color: var(--color-muted)">共 {posts.length} 篇文章</p>
+    </header>
 
-      {archives.length > 0 ? (
-        <div class="space-y-16">
-          {archives.map(([year, yearPosts]) => (
-            <section>
-              <h2 class="text-2xl font-bold mb-6 flex items-center gap-4"
-                  style="color: var(--color-accent)">
-                <span>{year}</span>
-                <span class="flex-1 h-px" style="background: color-mix(in srgb, var(--color-accent) 25%, transparent);"></span>
-                <span class="text-sm font-normal" style="color: var(--color-muted)">
-                  {yearPosts.length} 篇
-                </span>
-              </h2>
-              <div class="grid gap-2">
-                {yearPosts.map((post) => (
-                  <a
-                    href={`/blog/${post.id}/`}
-                    class="group flex items-baseline gap-6 p-4 rounded-xl
-                           transition-all duration-300 hover:-translate-x-1 hover:shadow-md no-underline"
-                    style="background: var(--color-surface); border: 1px solid var(--color-border);"
-                  >
-                    <time
-                      class="text-sm shrink-0 w-20 font-mono"
-                      style="color: var(--color-muted)"
-                      datetime={post.data.date.toISOString()}
-                    >
-                      {formatDate(post.data.date)}
-                    </time>
-                    <span class="min-w-0 truncate text-sm font-medium
-                                 transition-colors duration-300 group-hover:text-accent"
-                          style="color: var(--color-text)">
-                      {post.data.title}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      ) : (
-        <div class="text-center py-20">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-               style="background: var(--color-surface); border: 1px solid var(--color-border);">
-            <svg class="w-8 h-8 opacity-30" fill="none" stroke="currentColor"
-                 stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--color-muted)">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <p class="text-lg" style="color: var(--color-muted)">暂无文章</p>
-        </div>
-      )}
+    <div class="space-y-10 stagger-children">
+      {years.map((year) => (
+        <section>
+          <h2 class="text-xl font-bold mb-5 flex items-center gap-3" style="color: var(--color-text)">
+            <span class="text-accent">{year}</span>
+            <span class="flex-1 h-px bg-[var(--color-border)]"></span>
+          </h2>
+          <ul class="space-y-1">
+            {grouped[year].map((p) => {
+              const d = new Date(p.date);
+              const dateStr = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+              return (
+                <li class="flex items-center group">
+                  <span class="text-xs font-mono w-14 shrink-0" style="color: var(--color-muted)">{dateStr}</span>
+                  {p.category && (
+                    <span class="text-[10px] rounded px-1.5 py-0.5 mr-2 shrink-0 hidden sm:inline border"
+                          style="color: var(--color-accent); border-color: color-mix(in srgb, var(--color-accent) 15%, transparent); background: color-mix(in srgb, var(--color-accent) 5%, transparent);">{p.category}</span>
+                  )}
+                  <a href={`/blog/${p.slug}`}
+                     class="text-sm truncate transition-colors duration-200 hover:text-accent hover:no-underline block py-1.5"
+                     style="color: var(--color-text)">{p.title}</a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </div>
-  </main>
-
-  <Footer />
+  </div>
 </BaseLayout>

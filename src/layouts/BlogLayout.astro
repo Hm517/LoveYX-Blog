@@ -1,221 +1,118 @@
 ---
-// BlogLayout.astro - 博客文章布局
-// 继承 BaseLayout，提供文章容器、自动目录(TOC)、阅读时间、上下篇导航、Giscus 评论
-
-import BaseLayout from "./BaseLayout.astro";
-import type { CollectionEntry } from "astro:content";
+/** BlogLayout.astro — article detail layout */
+import BaseLayout from './BaseLayout.astro';
+import TOC from '../components/TOC.astro';
+import type { CollectionEntry } from 'astro:content';
 
 export interface Props {
-  entry: CollectionEntry<"blog">;
-  prevEntry?: CollectionEntry<"blog"> | null;
-  nextEntry?: CollectionEntry<"blog"> | null;
+  entry: CollectionEntry<'blog'>;
+  prevEntry?: { slug: string; title: string } | null;
+  nextEntry?: { slug: string; title: string } | null;
 }
 
 const { entry, prevEntry, nextEntry } = Astro.props;
-const { title, description, date, updated, tags, category, cover } = entry.data;
+const { title, description, date, tags = [], category, cover, readingTime } = entry.data;
+const displayDate = new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 
-// 阅读时间估算（中文约 300 字/分钟）
-const body = entry.body || "";
-const wordCount = body.replace(/\s/g, "").length;
-const readingTime = Math.max(1, Math.ceil(wordCount / 300));
-
-// 格式化日期
-const formatDate = (d: Date) =>
-  new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(d));
-
-const pubDate = formatDate(date);
-const updDate = updated ? formatDate(updated) : null;
+const headings = entry.data.headings as { depth: number; text: string; slug: string }[] | undefined;
 ---
 
-<BaseLayout
-  title={title}
-  description={description || undefined}
-  ogImage={cover || undefined}
-  canonicalURL={new URL(`/blog/${entry.id}/`, Astro.site).href}
->
-  <article class="flex-1">
-    <!-- Header -->
-    <header class="container-main py-16 sm:py-20">
-      <!-- Category & Tags -->
-      <div class="flex flex-wrap items-center gap-3 mb-8">
+<BaseLayout title={title} description={description} ogImage={cover}>
+  <div class="flex justify-center px-5">
+    <div class="w-full max-w-[728px] pt-10 pb-20">
+      <!-- Article Header -->
+      <header class="mb-10">
         {category && (
-          <a
-            href={`/categories/${String(category).toLowerCase()}/`}
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full
-                   text-xs font-semibold tracking-wide no-underline
-                   transition-all duration-300 hover:scale-105 hover:shadow-sm"
-            style="color: var(--color-accent);
-                   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-                   border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);"
-          >
-            <span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-accent)"></span>
-            {category}
+          <a href={`/categories/${encodeURIComponent(category)}`}
+             class="inline-flex items-center gap-1.5 mb-4 px-2.5 py-1 rounded-full text-xs font-medium
+                    transition-colors duration-300 hover:no-underline"
+             style="color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 8%, transparent);">
+            <span class="w-1 h-1 rounded-full bg-[var(--color-accent)]"></span>{category}
           </a>
         )}
-        {tags?.map((tag: string) => (
-          <a
-            href={`/tags/${tag.toLowerCase()}/`}
-            class="inline-flex items-center px-3 py-1.5 rounded-full
-                   text-xs font-medium no-underline
-                   transition-all duration-300 hover:scale-105 hover:shadow-sm"
-            style="color: var(--color-muted);
-                   background: var(--color-surface);
-                   border: 1px solid var(--color-border);"
-          >
-            #{tag}
-          </a>
-        ))}
-      </div>
-
-      <!-- Title -->
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-8"
-          style="color: var(--color-text)">
-        {title}
-      </h1>
-
-      <!-- Meta -->
-      <div class="flex flex-wrap items-center gap-5 text-sm"
-           style="color: var(--color-muted)">
-        <div class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
-               stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <time datetime={date.toISOString()}>{pubDate}</time>
-        </div>
-        {updDate && (
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight" style="color: var(--color-text)">{title}</h1>
+        {description && (
+          <p class="mt-4 text-base leading-relaxed" style="color: var(--color-muted)">{description}</p>
+        )}
+        <div class="mt-6 flex flex-wrap items-center gap-4 text-sm" style="color: var(--color-muted)">
           <div class="flex items-center gap-1.5">
-            <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
-                 stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            <span>{updDate}</span>
+            <svg class="w-3.5 h-3.5 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <time datetime={date}>{displayDate}</time>
+          </div>
+          {readingTime && (
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>{readingTime}</span>
+            </div>
+          )}
+        </div>
+        {tags.length > 0 && (
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {tags.map((tag: string) => (
+              <a href={`/tags/${encodeURIComponent(tag)}`}
+                 class="text-xs rounded-md px-2 py-0.5 transition-colors hover:no-underline"
+                 style="color: var(--color-muted); background: var(--color-surface); border: 1px solid var(--color-border);">#{tag}</a>
+            ))}
           </div>
         )}
-        <div class="flex items-center gap-1.5">
-          <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
-               stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span>{readingTime} 分钟阅读</span>
-        </div>
-      </div>
+      </header>
 
-      <!-- Cover Image -->
-      {cover && (
-        <div class="mt-10 -mx-4 sm:mx-0">
-          <img
-            src={cover}
-            alt={title}
-            class="w-full rounded-2xl object-cover shadow-2xl"
-            loading="eager"
-            style="max-height: 480px;"
-          />
-        </div>
-      )}
-    </header>
+      <div class="flex gap-10">
+        <!-- Article body -->
+        <div class="flex-1 min-w-0">
+          {cover && (
+            <img src={cover} alt={title}
+                 class="rounded-2xl w-full mb-10 shadow-lg" style="border: 1px solid var(--color-border);" loading="eager"/>
+          )}
+          <article class="prose prose-base sm:prose-lg max-w-none
+                          prose-headings:text-[var(--color-text)]
+                          prose-p:text-[var(--color-text)]/90 prose-p:leading-relaxed
+                          prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+                          prose-code:before:content-none prose-code:after:content-none
+                          prose-strong:text-[var(--color-text)]
+                          prose-li:text-[var(--color-text)]/90
+                          prose-blockquote:border-l-accent prose-blockquote:bg-[var(--color-surface)]
+                          prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:px-4
+                          prose-blockquote:text-[var(--color-muted)]
+                          prose-hr:border-[var(--color-border)]
+                          prose-img:rounded-xl prose-img:shadow-md">
+            <slot />
+          </article>
 
-    <!-- Content -->
-    <div class="container-main pb-12">
-      <div class="prose prose-lg max-w-none
-        prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight
-        prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6
-        prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
-        prose-p:text-text/90 prose-p:leading-relaxed prose-p:my-5
-        prose-li:text-text/90 prose-li:my-1.5
-        prose-strong:text-text prose-strong:font-semibold
-        prose-blockquote:border-l-4 prose-blockquote:border-accent
-        prose-blockquote:text-muted prose-blockquote:italic
-        prose-blockquote:bg-accent/3 prose-blockquote:rounded-r-xl prose-blockquote:py-3 prose-blockquote:px-6
-        prose-img:rounded-2xl prose-img:mx-auto prose-img:shadow-lg
-        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-        prose-code:before:content-none prose-code:after:content-none
-        prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-pre:rounded-xl
-        prose-table:rounded-xl prose-table:overflow-hidden
-        prose-th:bg-surface prose-th:py-3 prose-th:px-4
-        prose-td:py-2.5 prose-td:px-4
-        prose-hr:border-border">
-        <slot />
+          <!-- Prev / Next -->
+          {(prevEntry || nextEntry) && (
+            <nav class="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {prevEntry && (
+                <a href={`/blog/${prevEntry.slug}`}
+                   class="flex items-start gap-3 rounded-xl p-4 border transition-all duration-300
+                          hover:-translate-y-0.5 hover:shadow-lg hover:border-accent/[0.15] hover:no-underline"
+                   style="background: var(--color-surface); border-color: var(--color-border);">
+                  <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                  <div>
+                    <div class="text-xs" style="color: var(--color-muted)">上一篇</div>
+                    <div class="text-sm font-medium line-clamp-1 mt-1 transition-colors duration-300 hover:text-accent" style="color: var(--color-text)">{prevEntry.title}</div>
+                  </div>
+                </a>
+              )}
+              {nextEntry && (
+                <a href={`/blog/${nextEntry.slug}`}
+                   class="flex items-start justify-end gap-3 rounded-xl p-4 border transition-all duration-300 sm:text-right
+                          hover:-translate-y-0.5 hover:shadow-lg hover:border-accent/[0.15] hover:no-underline sm:col-start-2"
+                   style="background: var(--color-surface); border-color: var(--color-border);">
+                  <div>
+                    <div class="text-xs" style="color: var(--color-muted)">下一篇</div>
+                    <div class="text-sm font-medium line-clamp-1 mt-1 transition-colors duration-300 hover:text-accent" style="color: var(--color-text)">{nextEntry.title}</div>
+                  </div>
+                  <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--color-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+              )}
+            </nav>
+          )}
+        </div>
+
+        <!-- Sidebar TOC -->
+        {headings && headings.length > 0 && <TOC headings={headings} />}
       </div>
     </div>
-
-    <!-- Prev / Next Navigation -->
-    <nav class="container-main pb-12">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8"
-           style="border-top: 1px solid var(--color-border);">
-        {prevEntry ? (
-          <a
-            href={`/blog/${prevEntry.id}/`}
-            class="group p-5 rounded-2xl transition-all duration-300
-                   hover:-translate-y-0.5 hover:shadow-xl no-underline"
-            style="background: var(--color-surface); border: 1px solid var(--color-border);"
-          >
-            <div class="flex items-center gap-1.5 mb-2">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                   stroke-width="2" viewBox="0 0 24 24"
-                   style="color: var(--color-muted)">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-              </svg>
-              <span class="text-xs font-medium" style="color: var(--color-muted)">上一篇</span>
-            </div>
-            <p class="text-sm font-semibold leading-snug line-clamp-2
-                      transition-colors duration-300 group-hover:text-accent"
-               style="color: var(--color-text)">
-              {prevEntry.data.title}
-            </p>
-          </a>
-        ) : (
-          <div />
-        )}
-        {nextEntry ? (
-          <a
-            href={`/blog/${nextEntry.id}/`}
-            class="group p-5 rounded-2xl transition-all duration-300
-                   hover:-translate-y-0.5 hover:shadow-xl no-underline text-right"
-            style="background: var(--color-surface); border: 1px solid var(--color-border);"
-          >
-            <div class="flex items-center justify-end gap-1.5 mb-2">
-              <span class="text-xs font-medium" style="color: var(--color-muted)">下一篇</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                   stroke-width="2" viewBox="0 0 24 24"
-                   style="color: var(--color-muted)">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-            <p class="text-sm font-semibold leading-snug line-clamp-2
-                      transition-colors duration-300 group-hover:text-accent"
-               style="color: var(--color-text)">
-              {nextEntry.data.title}
-            </p>
-          </a>
-        ) : (
-          <div />
-        )}
-      </div>
-    </nav>
-
-    <!-- Giscus Comments -->
-    <div class="container-main pb-16">
-      <div class="pt-8" style="border-top: 1px solid var(--color-border);">
-        <div class="text-center py-8 rounded-2xl"
-             style="background: var(--color-surface); border: 1px solid var(--color-border);">
-          <svg class="w-8 h-8 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor"
-               stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--color-muted)">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
-          </svg>
-          <p class="text-sm" style="color: var(--color-muted)">
-            评论功能 (Giscus) — 部署后配置 GitHub Discussions 即可启用
-          </p>
-        </div>
-      </div>
-    </div>
-  </article>
+  </div>
 </BaseLayout>
