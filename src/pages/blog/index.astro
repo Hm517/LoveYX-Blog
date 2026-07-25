@@ -1,27 +1,19 @@
 ---
 // blog/index.astro — 博客列表页
-// 所有文章按日期降序，每页 8 篇
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BlogList from "../../components/BlogList.astro";
-import Pagination from "../../components/Pagination.astro";
 import Footer from "../../components/Footer.astro";
 
-export async function getStaticPaths({ paginate }: { paginate: any }) {
-  const posts = await getCollection("blog", ({ data }) => {
-    return import.meta.env.PROD ? !data.draft : true;
-  });
+const posts = await getCollection("blog", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
 
-  const sortedPosts = posts.sort(
-    (a, b) => b.data.date.getTime() - a.data.date.getTime()
-  );
+const sortedPosts = posts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 
-  return paginate(sortedPosts, { pageSize: 8 });
-}
-
-const { page } = Astro.props;
-
-const postItems = page.data.map((post: any) => {
+const postItems = sortedPosts.map((post) => {
   const body = post.body || "";
   const wordCount = body.replace(/\s/g, "").length;
   const readingTime = Math.max(1, Math.ceil(wordCount / 300));
@@ -39,30 +31,13 @@ const postItems = page.data.map((post: any) => {
 });
 ---
 
-<BaseLayout
-  title="博客"
-  canonicalURL={new URL(
-    page.currentPage === 1 ? "/blog/" : `/blog/page/${page.currentPage}/`,
-    Astro.site
-  ).href}
->
+<BaseLayout title="博客">
   <main class="flex-1 pt-24 pb-12">
     <div class="max-w-6xl mx-auto px-6">
       <h1 class="text-3xl font-bold text-text mb-2">博客</h1>
-      <p class="text-muted mb-10">
-        共 {page.total} 篇文章
-        {page.currentPage > 1 && ` · 第 ${page.currentPage} / ${page.lastPage} 页`}
-      </p>
-
+      <p class="text-muted mb-10">共 {sortedPosts.length} 篇文章</p>
       <BlogList posts={postItems} />
-
-      <Pagination
-        currentPage={page.currentPage}
-        totalPages={page.lastPage}
-        basePath="/blog"
-      />
     </div>
   </main>
-
   <Footer />
 </BaseLayout>
