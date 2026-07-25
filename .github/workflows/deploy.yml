@@ -19,25 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
       - uses: actions/configure-pages@v4
-
-      - run: pnpm build
-
+      - run: mkdir -p _site && cp -r index.html CNAME _site/ 2>/dev/null; cp index.html _site/ 2>/dev/null; true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./_site
 
   deploy:
     needs: build

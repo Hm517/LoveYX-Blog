@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoveYX Blog — 探索技术、AI 与生活的思考</title>
+<meta name="description" content="LoveYX Blog - 记录技术、AI、摄影与生活中的思考与探索">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0d0b1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e6f0;
+    --text-secondary: #9b97b8;
+    --accent: #a78bfa;
+    --accent2: #818cf8;
+    --gradient: linear-gradient(135deg, #a78bfa, #818cf8, #6366f1);
+    --gradient2: linear-gradient(135deg, #c084fc, #a78bfa);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background effects */
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08), transparent);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Layout */
+  .container { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+  @media(max-width:768px){ .container { padding:0 16px; } }
+
+  /* Header */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(13,11,26,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text);
+    text-decoration: none; letter-spacing: -0.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--gradient);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+  }
+  .nav { display: flex; gap: 8px; }
+  .nav a {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 14px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    font-weight: 450;
+  }
+  .nav a:hover { color: var(--text); background: var(--surface-hover); }
+
+  /* Hero */
+  .hero { padding: 100px 0 80px; position:relative; z-index:1; }
+  @media(max-width:768px){ .hero { padding:60px 0 50px; } }
+  .hero-inner { max-width:700px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid rgba(167,139,250,0.3);
+    background: rgba(167,139,250,0.08);
+    font-size: 13px; color: var(--accent);
+    margin-bottom: 28px;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation: pulse 2s infinite; }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 60px);
+    font-weight: 800; line-height: 1.15; letter-spacing: -1px;
+    margin-bottom: 20px; animation: fadeInUp 0.6s 0.1s ease-out both;
+  }
+  .hero h1 .gradient { background: var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .hero p {
+    font-size: 17px; color: var(--text-secondary); max-width: 500px;
+    margin-bottom: 36px; animation: fadeInUp 0.6s 0.2s ease-out both;
+  }
+  @media(max-width:768px){ .hero p { font-size:15px; } }
+  .hero-stats {
+    display: flex; gap: 36px; animation: fadeInUp 0.6s 0.3s ease-out both;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-size: 26px; font-weight: 700; background: var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .hero-stat .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  @media(max-width:768px){ .hero-stats { gap:24px; } .hero-stat .num { font-size:22px; } }
+
+  /* Section */
+  .section { padding: 60px 0; }
+  .section-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 32px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title .icon {
+    width: 36px; height: 36px;
+    background: rgba(167,139,250,0.12);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title .icon svg { width:16px; height:16px; color: var(--accent); stroke: var(--accent); }
+
+  /* Card Grid */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  @media(max-width:640px){ .card-grid { grid-template-columns: 1fr; } }
+
+  /* Blog Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    text-decoration: none; color: inherit;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column; gap: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(600px circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(167,139,250,0.06), transparent 40%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(167,139,250,0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(167,139,250,0.08);
+  }
+  .card-category {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--accent);
+    background: rgba(167,139,250,0.1);
+    padding: 3px 10px; border-radius: 12px;
+    width: fit-content;
+  }
+  .card h3 { font-size: 18px; font-weight: 650; line-height: 1.4; letter-spacing: -0.2px; }
+  .card p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .card-meta span { display: flex; align-items: center; gap: 5px; }
+  .card-meta svg { width:13px; height:13px; opacity: 0.5; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .card-tag {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 6px; color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    transition: all 0.2s;
+  }
+  .card:hover .card-tag { border-color: rgba(167,139,250,0.2); }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border); padding: 40px 0;
+    margin-top: 40px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* Animations */
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">L</div>
+        LoveYX Blog
+      </a>
+      <nav class="nav">
+        <a href="/">首页</a>
+        <a href="#posts">文章</a>
+        <a href="#about">关于</a>
+        <a href="#rss">RSS</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-badge"><span class="dot"></span>持续更新中</div>
+        <h1>用代码构建<span class="gradient">数字花园</span></h1>
+        <p>记录技术探索、AI 实践与生活中的思考。每一篇文章，都是成长的痕迹。</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num">5</div><div class="label">篇文章</div></div>
+          <div class="hero-stat"><div class="num">4</div><div class="label">个分类</div></div>
+          <div class="hero-stat"><div class="num">11</div><div class="label">个标签</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="posts">
+      <div class="container">
+        <h2 class="section-title">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+          所有文章
+        </h2>
+        <div class="card-grid">
+          <a href="#" class="card">
+            <div class="card-category">学习</div>
+            <h3>2026 上半年学习总结：在 AI 浪潮中保持清醒</h3>
+            <p>回顾 2026 上半年在 Rust、分布式系统和 AI Agent 框架方面的学习历程，反思学习方法论。</p>
+            <div class="card-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-17</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>6 分钟</span>
+            </div>
+            <div class="card-tags"><span class="card-tag">学习</span><span class="card-tag">笔记</span></div>
+          </a>
+          <a href="#" class="card">
+            <div class="card-category">摄影</div>
+            <h3>摄影基础入门：从光圈到构图，一张好照片的诞生</h3>
+            <p>写给摄影新手的入门指南，涵盖曝光三角、常用构图法与后期调色思路。</p>
+            <div class="card-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-16</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>5 分钟</span>
+            </div>
+            <div class="card-tags"><span class="card-tag">摄影</span><span class="card-tag">教程</span></div>
+          </a>
+          <a href="#" class="card">
+            <div class="card-category">AI</div>
+            <h3>Prompt Engineering 实践技巧：让 AI 输出更精准</h3>
+            <p>分享日常使用大语言模型时积累的 Prompt Engineering 实践心得，涵盖角色设定、结构化输出与思维链技巧。</p>
+            <div class="card-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-14</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>7 分钟</span>
+            </div>
+            <div class="card-tags"><span class="card-tag">AI</span><span class="card-tag">Prompt</span><span class="card-tag">LLM</span></div>
+          </a>
+          <a href="#" class="card">
+            <div class="card-category">编程</div>
+            <h3>Astro SSG 入门指南：从零构建高性能静态博客</h3>
+            <p>全面解析 Astro 静态站点生成器的核心概念、群岛架构与常用实践，含 TypeScript 代码示例。</p>
+            <div class="card-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-12</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>8 分钟</span>
+            </div>
+            <div class="card-tags"><span class="card-tag">Astro</span><span class="card-tag">SSG</span><span class="card-tag">前端</span></div>
+          </a>
+          <a href="#" class="card">
+            <div class="card-category">生活</div>
+            <h3>个人博客开篇：用代码构建属于自己的数字花园</h3>
+            <p>记录踏上独立博客之旅的初心与期待，分享用 Astro 搭建个人网站的心路历程。</p>
+            <div class="card-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-10</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>4 分钟</span>
+            </div>
+            <div class="card-tags"><span class="card-tag">博客</span><span class="card-tag">Astro</span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about" style="padding-bottom:20px;">
+      <div class="container">
+        <h2 class="section-title">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          关于我
+        </h2>
+        <div class="card" style="max-width:600px;">
+          <p style="font-size:15px; color:var(--text-secondary); line-height:1.8;">
+            一个热爱技术与创造的开发者。在这里记录编程、AI、摄影与生活中的探索与思考。
+            相信写作是最好的思考方式，独立博客是互联网时代最后的自留地。
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <div class="footer-links">
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank">GitHub</a>
+        <a href="#rss">RSS</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mouse tracking for card glow effect
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mouse-x', x + '%');
+        card.style.setProperty('--mouse-y', y + '%');
+      });
+    });
+  </script>
+</body>
+</html>
