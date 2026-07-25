@@ -2,8 +2,8 @@
 // archive.astro — 归档页
 // 按年份分组展示所有文章，时间线形式
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Footer from "../../components/Footer.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Footer from "../components/Footer.astro";
 
 const posts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
