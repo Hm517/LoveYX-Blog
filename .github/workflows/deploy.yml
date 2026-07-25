@@ -22,7 +22,9 @@ jobs:
       - uses: actions/configure-pages@v4
       - run: |
           mkdir -p _site
-          cp *.html _site/
+          cp index.html _site/
+          cp *.html _site/ 2>/dev/null || true
+          cp -r images _site/ 2>/dev/null || true
           test -f CNAME && cp CNAME _site/ || true
       - uses: actions/upload-pages-artifact@v3
         with:

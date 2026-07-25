@@ -6,159 +6,218 @@
 <title>摄影基础入门：从光圈到构图，一张好照片的诞生 — LoveYX Blog</title>
 <meta name="description" content="写给摄影新手的入门指南，覆盖曝光三角、常用构图法与后期调色思路，帮你迈出摄影第一步。">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Gaegu&display=swap');
+
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --bg: #0d0b1a;
-    --surface: rgba(255,255,255,0.04);
-    --surface-hover: rgba(255,255,255,0.08);
-    --border: rgba(255,255,255,0.08);
-    --text: #e8e6f0;
-    --text-secondary: #9b97b8;
-    --accent: #a78bfa;
-    --accent2: #818cf8;
-    --gradient: linear-gradient(135deg, #a78bfa, #818cf8, #6366f1);
-    --gradient2: linear-gradient(135deg, #c084fc, #a78bfa);
-    --radius: 16px;
-    --radius-sm: 10px;
+    --pink: #f8a5c2;
+    --peach: #fab1a0;
+    --lavender: #c8a2c8;
+    --cream: #fdf6f0;
+    --mint: #b2d8c8;
+    --bg: #fff5f0;
+    --surface: rgba(255,245,240,0.65);
+    --surface-hover: rgba(255,235,225,0.85);
+    --border: rgba(248,165,194,0.22);
+    --text: #5c4a5e;
+    --text-secondary: #8a7a8b;
+    --accent: #f8a5c2;
+    --accent2: #c8a2c8;
+    --gradient: linear-gradient(135deg, #f8a5c2, #fab1a0, #c8a2c8);
+    --gradient2: linear-gradient(135deg, #fab1a0, #f8a5c2);
+    --radius: 24px;
+    --radius-sm: 16px;
+    --radius-lg: 28px;
   }
-  html { scroll-behavior:smooth; }
+  html { scroll-behavior:smooth; font-size:16px; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.7;
+    line-height: 1.85;
     min-height: 100vh;
     overflow-x: hidden;
+    letter-spacing: 0.3px;
   }
+
   .bg-glow {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background:
-      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08), transparent);
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(248,165,194,0.14), transparent),
+      radial-gradient(ellipse 50% 35% at 80% 100%, rgba(200,162,200,0.12), transparent);
   }
-  .bg-grid {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
-    background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
+  .bg-grid { display: none; }
+
   .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
   @media(max-width:768px){ .container { padding:0 16px; } }
+
   .header {
     position: sticky; top: 0; z-index: 100;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(13,11,26,0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255,245,240,0.75);
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 20px rgba(248,165,194,0.06);
   }
   .header-inner {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 0;
+    padding: 14px 0;
   }
   .logo {
     display: flex; align-items: center; gap: 10px;
-    font-size: 18px; font-weight: 700; color: var(--text);
-    text-decoration: none; letter-spacing: -0.3px;
+    font-size: 19px; font-weight: 700; color: var(--text);
+    text-decoration: none;
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    letter-spacing: 0.5px;
   }
   .logo-icon {
-    width: 32px; height: 32px;
+    width: 36px; height: 36px;
     background: var(--gradient);
-    border-radius: 8px;
+    border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: #fff;
-    box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+    font-size: 16px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 18px rgba(248,165,194,0.35);
   }
-  .nav { display: flex; gap: 8px; }
+  .nav { display: flex; gap: 6px; }
   .nav a {
-    padding: 7px 16px; border-radius: 20px;
+    padding: 8px 18px; border-radius: 22px;
     font-size: 14px; color: var(--text-secondary);
-    text-decoration: none; transition: all 0.2s;
-    font-weight: 450;
+    text-decoration: none; transition: all 0.25s;
+    font-weight: 500;
   }
-  .nav a:hover { color: var(--text); background: var(--surface-hover); }
+  .nav a:hover {
+    color: var(--pink);
+    background: rgba(248,165,194,0.12);
+    transform: translateY(-1px);
+  }
 
-  article { padding: 60px 0 80px; }
+  article { padding: 50px 0 70px; }
   .article-header { margin-bottom: 48px; }
   .back-link {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 14px; color: var(--text-secondary); text-decoration: none;
-    margin-bottom: 24px; transition: color 0.2s;
+    margin-bottom: 28px; transition: color 0.25s;
+    padding: 6px 14px; border-radius: 20px;
+    background: rgba(248,165,194,0.06);
   }
-  .back-link:hover { color: var(--accent); }
+  .back-link:hover {
+    color: var(--pink);
+    background: rgba(248,165,194,0.14);
+  }
   .back-link svg { width: 16px; height: 16px; }
+
   .category-badge {
     display: inline-flex;
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.5px; color: var(--accent);
-    background: rgba(167,139,250,0.1);
-    padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.8px; color: var(--pink);
+    background: rgba(248,165,194,0.12);
+    padding: 4px 12px; border-radius: 14px;
     margin-bottom: 16px;
   }
   .article-header h1 {
     font-size: clamp(26px, 5vw, 42px);
-    font-weight: 800; line-height: 1.25; letter-spacing: -0.5px;
+    font-weight: 700; line-height: 1.3;
     margin-bottom: 20px;
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    color: #4a3a4c;
   }
   .article-meta {
     display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
     font-size: 14px; color: var(--text-secondary);
   }
   .article-meta span { display: flex; align-items: center; gap: 5px; }
-  .article-meta svg { width: 14px; height: 14px; opacity: 0.5; }
+  .article-meta svg { width: 14px; height: 14px; opacity: 0.45; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .tag {
-    font-size: 11px; padding: 3px 8px;
-    border-radius: 6px; color: var(--text-secondary);
-    border: 1px solid rgba(255,255,255,0.06);
-    background: rgba(255,255,255,0.03);
+    font-size: 11px; padding: 4px 10px;
+    border-radius: 12px; color: var(--text-secondary);
+    border: 1px solid rgba(248,165,194,0.18);
+    background: rgba(248,165,194,0.06);
+    transition: all 0.2s;
   }
 
-  .article-content { font-size: 16px; line-height: 1.85; }
+  /* Separator */
+  .article-header::after {
+    content: '';
+    display: block;
+    width: 60px; height: 3px;
+    background: var(--gradient);
+    border-radius: 4px;
+    margin-top: 28px;
+  }
+
+  .article-content {
+    font-size: 16px; line-height: 1.95;
+    background: rgba(255,245,240,0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  @media(max-width:640px){ .article-content { padding: 24px 20px; } }
   .article-content h2 {
-    font-size: 24px; font-weight: 700; margin: 48px 0 16px;
-    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    font-size: 24px; font-weight: 700; margin: 48px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(248,165,194,0.25);
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    color: #4a3a4c;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .article-content h2::before {
+    content: '\2728';
+    font-size: 18px;
   }
   .article-content h3 {
-    font-size: 19px; font-weight: 650; margin: 32px 0 12px;
+    font-size: 19px; font-weight: 650; margin: 32px 0 14px;
+    color: var(--lavender);
   }
   .article-content h4 {
     font-size: 16px; font-weight: 600; margin: 24px 0 10px;
   }
-  .article-content p { margin-bottom: 18px; color: #d4d0e8; }
-  .article-content strong { color: var(--text); font-weight: 650; }
-  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
-  .article-content li { margin-bottom: 8px; color: #d4d0e8; }
+  .article-content p { margin-bottom: 18px; color: var(--text); line-height: 1.95; }
+  .article-content strong { color: var(--pink); font-weight: 650; }
+  .article-content ul, .article-content ol {
+    margin-bottom: 18px; padding-left: 24px;
+  }
+  .article-content li { margin-bottom: 9px; color: var(--text); line-height: 1.8; }
   .article-content code {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
-    font-size: 13px; padding: 2px 6px;
-    background: rgba(167,139,250,0.12);
-    border-radius: 4px; color: var(--accent);
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+    font-size: 13px; padding: 2px 7px;
+    background: rgba(248,165,194,0.12);
+    border-radius: 6px; color: var(--lavender);
   }
   .article-content pre {
     margin: 20px 0; padding: 20px 24px;
-    background: rgba(0,0,0,0.4);
+    background: rgba(255,245,240,0.6);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow-x: auto;
     font-size: 13px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
   .article-content pre code {
-    background: none; padding: 0; color: #d4d0e8;
+    background: none; padding: 0; color: var(--text);
     font-size: 13px;
   }
   .article-content blockquote {
-    border-left: 3px solid var(--accent);
-    padding: 12px 20px; margin: 20px 0;
-    background: rgba(167,139,250,0.05);
+    border-left: 4px solid var(--pink);
+    padding: 14px 22px; margin: 22px 0;
+    background: rgba(248,165,194,0.08);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    color: var(--text-secondary); font-style: italic;
+    color: var(--text-secondary);
+    font-style: italic;
   }
-  .article-content img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+  .article-content img {
+    max-width:100%; border-radius: var(--radius-sm);
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(248,165,194,0.12);
+  }
 
   .footer {
-    border-top: 1px solid var(--border); padding: 40px 0;
-    margin-top: 40px; position:relative; z-index:1;
+    border-top: 2px dashed rgba(248,165,194,0.3);
+    padding: 40px 0;
+    margin-top: 50px; position:relative; z-index:1;
   }
   .footer-inner {
     display: flex; justify-content: space-between; align-items: center;
@@ -166,15 +225,23 @@
   }
   .footer p { font-size: 13px; color: var(--text-secondary); }
   .footer-links { display: flex; gap: 20px; }
-  .footer-links a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
-  .footer-links a:hover { color: var(--accent); }
+  .footer-links a {
+    font-size: 13px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    padding: 4px 8px; border-radius: 10px;
+  }
+  .footer-links a:hover { color: var(--pink); background: rgba(248,165,194,0.08); }
+  .footer::after {
+    content: '\2763\FE0F \2728 \273F \FE0F';
+    display: block; text-align: center; font-size: 14px;
+    margin-top: 12px; letter-spacing: 8px; color: rgba(248,165,194,0.35);
+  }
 
-  @keyframes fadeInUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
 </style>
 </head>
 <body>
   <div class="bg-glow"></div>
-  <div class="bg-grid"></div>
 
   <header class="header">
     <div class="container header-inner">

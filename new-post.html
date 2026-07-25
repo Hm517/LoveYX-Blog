@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>个人博客开篇：用代码构建属于自己的数字花园 — LoveYX Blog</title>
-<meta name="description" content="记录踏上独立博客之旅的初衷与期待，分享用 Astro 搭建个人网站的心路历程。">
+<title>文章标题 — LoveYX Blog</title>
+<meta name="description" content="文章简介，用于SEO和社交媒体分享">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Gaegu&display=swap');
 
@@ -27,7 +27,6 @@
     --gradient2: linear-gradient(135deg, #fab1a0, #f8a5c2);
     --radius: 24px;
     --radius-sm: 16px;
-    --radius-lg: 28px;
   }
   html { scroll-behavior:smooth; font-size:16px; }
   body {
@@ -39,15 +38,12 @@
     overflow-x: hidden;
     letter-spacing: 0.3px;
   }
-
   .bg-glow {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background:
       radial-gradient(ellipse 60% 40% at 20% 0%, rgba(248,165,194,0.14), transparent),
       radial-gradient(ellipse 50% 35% at 80% 100%, rgba(200,162,200,0.12), transparent);
   }
-  .bg-grid { display: none; }
-
   .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
   @media(max-width:768px){ .container { padding:0 16px; } }
 
@@ -136,7 +132,6 @@
     transition: all 0.2s;
   }
 
-  /* Separator */
   .article-header::after {
     content: '';
     display: block;
@@ -172,14 +167,10 @@
     font-size: 19px; font-weight: 650; margin: 32px 0 14px;
     color: var(--lavender);
   }
-  .article-content h4 {
-    font-size: 16px; font-weight: 600; margin: 24px 0 10px;
-  }
+  .article-content h4 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
   .article-content p { margin-bottom: 18px; color: var(--text); line-height: 1.95; }
   .article-content strong { color: var(--pink); font-weight: 650; }
-  .article-content ul, .article-content ol {
-    margin-bottom: 18px; padding-left: 24px;
-  }
+  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
   .article-content li { margin-bottom: 9px; color: var(--text); line-height: 1.8; }
   .article-content code {
     font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
@@ -265,70 +256,29 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
             返回首页
           </a>
-          <div class="category-badge">生活</div>
-          <h1>个人博客开篇：用代码构建属于自己的数字花园</h1>
+          <div class="category-badge">分类名称</div>
+          <h1>文章标题</h1>
           <div class="article-meta">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-10</span>
-            <span>生活</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-25</span>
+            <span>分类名称</span>
           </div>
-          <div class="tags" style="margin-top: 14px;"><span class="tag">博客</span><span class="tag">Astro</span></div>
+          <div class="tags" style="margin-top: 14px;">
+            <span class="tag">标签1</span>
+            <span class="tag">标签2</span>
+          </div>
         </div>
         <div class="article-content">
-<h2>为什么要搭建自己的博客</h2>
 
-<p>2026 年的互联网，内容创作平台已经极度成熟。公众号、知乎、Notion、Medium——每个平台都在争夺我们的注意力。然而，我始终认为独立博客有着不可替代的价值。</p>
+          <h2>第一个章节标题</h2>
+          <p>在这里写正文。正文内容……</p>
 
-<p>首先，<strong>数据自主权</strong>。在第三方平台写作，你的内容随时可能因为平台策略变更而消失。独立博客意味着你拥有每一篇文章、每一张图片的完整控制权。域名是你的，服务器是你的（或者说 GitHub 上那个仓库是你的），没有算法会决定你的文章该不该被推荐。</p>
+          <h2>第二个章节标题</h2>
+          <p>更多正文内容……</p>
 
-<p>其次，<strong>技术表达的纯粹性</strong>。作为一个程序员，我在写作时经常需要嵌入代码块、数学公式，甚至交互式图表。大多数内容平台对代码高亮的支持参差不齐，更不用说 Mermaid 流程图或 LaTeX 数学公式了。在自己的博客里，我可以完全掌控渲染管线。</p>
+          <!-- 插入图片示例：
+          <img src="images/your-photo.jpg" alt="图片说明">
+          -->
 
-<h2>为什么选择 Astro</h2>
-
-<p>市面上静态网站生成器很多——Hugo、Gatsby、Next.js、Hexo。最终选择 Astro 有三个核心理由：</p>
-
-<ul>
-<li><strong>Islands Architecture（群岛架构）</strong>：大部分内容纯静态，只在你需要交互的地方加载 JavaScript。这意味着页面默认零 JS，加载极快。</li>
-<li><strong>多框架兼容</strong>：同一项目可以混合使用 React、Vue、Svelte 组件，互不干扰。</li>
-<li><strong>一流的内容层</strong>：Astro 的 Content Collections 提供了类型安全的 Markdown/MDX 管理，配合 Zod schema 校验 frontmatter，再也不用担心文章元数据格式错误。</li>
-</ul>
-
-<p>举一个简单的例子，定义一个博客文章的 frontmatter 类型：</p>
-
-<pre><code>// src/content/config.ts
-import { defineCollection, z } from 'astro:content';
-
-const blogCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-    category: z.string(),
-    tags: z.array(z.string()),
-    description: z.string(),
-    cover: z.string().optional(),
-  }),
-});
-
-export const collections = { blog: blogCollection };</code></pre>
-
-<h2>博客的定位与未来</h2>
-
-<p>LoveYX Blog 的定位是「记录技术、AI、生活与思考」。我不会限定自己只写技术文章——摄影技巧、读书笔记、旅行见闻都会出现在这里。博客应该是完整的数字自我，而不是单一维度的技术手册。</p>
-
-<p>接下来的计划包括：</p>
-
-<ul>
-<li>完善标签系统和分类导航</li>
-<li>接入 Giscus 评论，让交流回归 GitHub</li>
-<li>配置 RSS 订阅，不依赖任何平台推送</li>
-<li>持续优化性能，保底 Lighthouse 95+</li>
-</ul>
-
-<h2>结语</h2>
-
-<p>搭建博客的过程本身就是一次创造。每一行代码、每一处留白、每一个字体选择，都是自我表达的一部分。希望这个小小的数字花园能在未来不断生长，也欢迎每一位路过的读者留下足迹。</p>
-
-<p>感谢你愿意花时间读到这里。我们下一篇文章见。</p>
         </div>
       </article>
     </div>
