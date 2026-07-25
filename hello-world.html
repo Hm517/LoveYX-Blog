@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人博客开篇：用代码构建属于自己的数字花园 — LoveYX Blog</title>
+<meta name="description" content="记录踏上独立博客之旅的初衷与期待，分享用 Astro 搭建个人网站的心路历程。">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0d0b1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e6f0;
+    --text-secondary: #9b97b8;
+    --accent: #a78bfa;
+    --accent2: #818cf8;
+    --gradient: linear-gradient(135deg, #a78bfa, #818cf8, #6366f1);
+    --gradient2: linear-gradient(135deg, #c084fc, #a78bfa);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08), transparent);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+  @media(max-width:768px){ .container { padding:0 16px; } }
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(13,11,26,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text);
+    text-decoration: none; letter-spacing: -0.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--gradient);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+  }
+  .nav { display: flex; gap: 8px; }
+  .nav a {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 14px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    font-weight: 450;
+  }
+  .nav a:hover { color: var(--text); background: var(--surface-hover); }
+
+  article { padding: 60px 0 80px; }
+  .article-header { margin-bottom: 48px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    margin-bottom: 24px; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { width: 16px; height: 16px; }
+  .category-badge {
+    display: inline-flex;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--accent);
+    background: rgba(167,139,250,0.1);
+    padding: 3px 10px; border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .article-header h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800; line-height: 1.25; letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+  .article-meta {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: 14px; color: var(--text-secondary);
+  }
+  .article-meta span { display: flex; align-items: center; gap: 5px; }
+  .article-meta svg { width: 14px; height: 14px; opacity: 0.5; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 6px; color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .article-content { font-size: 16px; line-height: 1.85; }
+  .article-content h2 {
+    font-size: 24px; font-weight: 700; margin: 48px 0 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .article-content h3 {
+    font-size: 19px; font-weight: 650; margin: 32px 0 12px;
+  }
+  .article-content h4 {
+    font-size: 16px; font-weight: 600; margin: 24px 0 10px;
+  }
+  .article-content p { margin-bottom: 18px; color: #d4d0e8; }
+  .article-content strong { color: var(--text); font-weight: 650; }
+  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
+  .article-content li { margin-bottom: 8px; color: #d4d0e8; }
+  .article-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-size: 13px; padding: 2px 6px;
+    background: rgba(167,139,250,0.12);
+    border-radius: 4px; color: var(--accent);
+  }
+  .article-content pre {
+    margin: 20px 0; padding: 20px 24px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .article-content pre code {
+    background: none; padding: 0; color: #d4d0e8;
+    font-size: 13px;
+  }
+  .article-content blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 12px 20px; margin: 20px 0;
+    background: rgba(167,139,250,0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary); font-style: italic;
+  }
+  .article-content img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+
+  .footer {
+    border-top: 1px solid var(--border); padding: 40px 0;
+    margin-top: 40px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">L</div>
+        LoveYX Blog
+      </a>
+      <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="index.html#posts">文章</a>
+        <a href="index.html#about">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article>
+        <div class="article-header">
+          <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+            返回首页
+          </a>
+          <div class="category-badge">生活</div>
+          <h1>个人博客开篇：用代码构建属于自己的数字花园</h1>
+          <div class="article-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-10</span>
+            <span>生活</span>
+          </div>
+          <div class="tags" style="margin-top: 14px;"><span class="tag">博客</span><span class="tag">Astro</span></div>
+        </div>
+        <div class="article-content">
+<h2>为什么要搭建自己的博客</h2>
+
+<p>2026 年的互联网，内容创作平台已经极度成熟。公众号、知乎、Notion、Medium——每个平台都在争夺我们的注意力。然而，我始终认为独立博客有着不可替代的价值。</p>
+
+<p>首先，<strong>数据自主权</strong>。在第三方平台写作，你的内容随时可能因为平台策略变更而消失。独立博客意味着你拥有每一篇文章、每一张图片的完整控制权。域名是你的，服务器是你的（或者说 GitHub 上那个仓库是你的），没有算法会决定你的文章该不该被推荐。</p>
+
+<p>其次，<strong>技术表达的纯粹性</strong>。作为一个程序员，我在写作时经常需要嵌入代码块、数学公式，甚至交互式图表。大多数内容平台对代码高亮的支持参差不齐，更不用说 Mermaid 流程图或 LaTeX 数学公式了。在自己的博客里，我可以完全掌控渲染管线。</p>
+
+<h2>为什么选择 Astro</h2>
+
+<p>市面上静态网站生成器很多——Hugo、Gatsby、Next.js、Hexo。最终选择 Astro 有三个核心理由：</p>
+
+<ul>
+<li><strong>Islands Architecture（群岛架构）</strong>：大部分内容纯静态，只在你需要交互的地方加载 JavaScript。这意味着页面默认零 JS，加载极快。</li>
+<li><strong>多框架兼容</strong>：同一项目可以混合使用 React、Vue、Svelte 组件，互不干扰。</li>
+<li><strong>一流的内容层</strong>：Astro 的 Content Collections 提供了类型安全的 Markdown/MDX 管理，配合 Zod schema 校验 frontmatter，再也不用担心文章元数据格式错误。</li>
+</ul>
+
+<p>举一个简单的例子，定义一个博客文章的 frontmatter 类型：</p>
+
+<pre><code>// src/content/config.ts
+import { defineCollection, z } from 'astro:content';
+
+const blogCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    category: z.string(),
+    tags: z.array(z.string()),
+    description: z.string(),
+    cover: z.string().optional(),
+  }),
+});
+
+export const collections = { blog: blogCollection };</code></pre>
+
+<h2>博客的定位与未来</h2>
+
+<p>LoveYX Blog 的定位是「记录技术、AI、生活与思考」。我不会限定自己只写技术文章——摄影技巧、读书笔记、旅行见闻都会出现在这里。博客应该是完整的数字自我，而不是单一维度的技术手册。</p>
+
+<p>接下来的计划包括：</p>
+
+<ul>
+<li>完善标签系统和分类导航</li>
+<li>接入 Giscus 评论，让交流回归 GitHub</li>
+<li>配置 RSS 订阅，不依赖任何平台推送</li>
+<li>持续优化性能，保底 Lighthouse 95+</li>
+</ul>
+
+<h2>结语</h2>
+
+<p>搭建博客的过程本身就是一次创造。每一行代码、每一处留白、每一个字体选择，都是自我表达的一部分。希望这个小小的数字花园能在未来不断生长，也欢迎每一位路过的读者留下足迹。</p>
+
+<p>感谢你愿意花时间读到这里。我们下一篇文章见。</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <div class="footer-links">
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

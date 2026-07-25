@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astro SSG 入门指南：从零构建高性能静态博客 — LoveYX Blog</title>
+<meta name="description" content="全面解析 Astro 静态站点生成器的核心概念、群岛架构与常用实践，含 TypeScript 代码示例。">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0d0b1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e6f0;
+    --text-secondary: #9b97b8;
+    --accent: #a78bfa;
+    --accent2: #818cf8;
+    --gradient: linear-gradient(135deg, #a78bfa, #818cf8, #6366f1);
+    --gradient2: linear-gradient(135deg, #c084fc, #a78bfa);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08), transparent);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+  @media(max-width:768px){ .container { padding:0 16px; } }
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(13,11,26,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text);
+    text-decoration: none; letter-spacing: -0.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--gradient);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+  }
+  .nav { display: flex; gap: 8px; }
+  .nav a {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 14px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    font-weight: 450;
+  }
+  .nav a:hover { color: var(--text); background: var(--surface-hover); }
+
+  article { padding: 60px 0 80px; }
+  .article-header { margin-bottom: 48px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    margin-bottom: 24px; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { width: 16px; height: 16px; }
+  .category-badge {
+    display: inline-flex;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--accent);
+    background: rgba(167,139,250,0.1);
+    padding: 3px 10px; border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .article-header h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800; line-height: 1.25; letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+  .article-meta {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: 14px; color: var(--text-secondary);
+  }
+  .article-meta span { display: flex; align-items: center; gap: 5px; }
+  .article-meta svg { width: 14px; height: 14px; opacity: 0.5; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 6px; color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .article-content { font-size: 16px; line-height: 1.85; }
+  .article-content h2 {
+    font-size: 24px; font-weight: 700; margin: 48px 0 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .article-content h3 {
+    font-size: 19px; font-weight: 650; margin: 32px 0 12px;
+  }
+  .article-content h4 {
+    font-size: 16px; font-weight: 600; margin: 24px 0 10px;
+  }
+  .article-content p { margin-bottom: 18px; color: #d4d0e8; }
+  .article-content strong { color: var(--text); font-weight: 650; }
+  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
+  .article-content li { margin-bottom: 8px; color: #d4d0e8; }
+  .article-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-size: 13px; padding: 2px 6px;
+    background: rgba(167,139,250,0.12);
+    border-radius: 4px; color: var(--accent);
+  }
+  .article-content pre {
+    margin: 20px 0; padding: 20px 24px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .article-content pre code {
+    background: none; padding: 0; color: #d4d0e8;
+    font-size: 13px;
+  }
+  .article-content blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 12px 20px; margin: 20px 0;
+    background: rgba(167,139,250,0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary); font-style: italic;
+  }
+  .article-content img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+
+  .footer {
+    border-top: 1px solid var(--border); padding: 40px 0;
+    margin-top: 40px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">L</div>
+        LoveYX Blog
+      </a>
+      <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="index.html#posts">文章</a>
+        <a href="index.html#about">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article>
+        <div class="article-header">
+          <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+            返回首页
+          </a>
+          <div class="category-badge">编程</div>
+          <h1>Astro SSG 入门指南：从零构建高性能静态博客</h1>
+          <div class="article-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-12</span>
+            <span>编程</span>
+          </div>
+          <div class="tags" style="margin-top: 14px;"><span class="tag">Astro</span><span class="tag">SSG</span><span class="tag">前端</span></div>
+        </div>
+        <div class="article-content">
+<h2>什么是 Static Site Generation</h2>
+
+<p>静态站点生成（SSG）的理念很简单：在构建阶段把所有页面预渲染成 HTML，部署时直接提供静态文件。没有服务器运行时，没有数据库查询，CDN 可以直接缓存所有内容。结果是极致的加载速度和极高的安全性。</p>
+
+<p>但传统 SSG 有一个明显缺陷：<strong>每增加一点交互性，就不得不引入大量 JavaScript</strong>。比如一个评论系统或搜索框，往往需要把整个页面变成一个 SPA。</p>
+
+<p>Astro 的解决方法就是 <strong>Islands Architecture（群岛架构）</strong>。</p>
+
+<h2>Islands Architecture 详解</h2>
+
+<p>Astro 把页面分为两个区域：</p>
+
+<ul>
+<li><strong>静态海洋</strong>：页面主体内容（文章、导航、页脚），构建时直接渲染为 HTML，客户端零 JS。</li>
+<li><strong>交互岛屿</strong>：需要交互的部分（评论区、主题切换按钮、搜索框），各自独立加载 JavaScript。</li>
+</ul>
+
+<p>这意味着你的博客文章页可能只有评论区那个 3KB 的脚本，文章正文完全是纯 HTML。</p>
+
+<pre><code>// 示例：在 Astro 页面中引入交互式组件
+---
+// 顶部 frontmatter（服务端执行，不会发送到客户端）
+import CommentSection from '../components/CommentSection';
+import ThemeToggle from '../components/ThemeToggle.astro';
+---
+&lt;article&gt;
+  &lt;h1&gt;{frontmatter.title}&lt;/h1&gt;
+  &lt;!-- 纯静态内容 --&gt;
+  &lt;Content /&gt;
+&lt;/article&gt;
+
+&lt;!-- 交互式岛屿：只在需要时才加载 JS --&gt;
+&lt;CommentSection client:load /&gt;
+&lt;ThemeToggle client:idle /&gt;</code></pre>
+
+<h2>Content Collections：类型安全的 Markdown</h2>
+
+<p>Astro 的 Content Collections 功能是其杀手锏之一。通过 Zod schema 定义 frontmatter 结构，你可以在编辑器中获得自动补全，在构建时捕获元数据错误：</p>
+
+<pre><code>import { getCollection } from 'astro:content';
+
+// 获取所有博客文章，自动按日期排序
+const posts = await getCollection('blog', ({ data }) =&gt; {
+  return !data.draft;
+});
+
+// 按分类筛选
+const aiPosts = posts.filter(
+  post =&gt; post.data.category === 'AI'
+);</code></pre>
+
+<h2>路由与动态页面</h2>
+
+<p>Astro 的文件路由极其直观。<code>src/pages/blog/[slug].astro</code> 自动匹配 <code>/blog/hello-world/</code> 这样的路径：</p>
+
+<pre><code>---
+// src/pages/blog/[slug].astro
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post =&gt; ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+&lt;BlogLayout frontmatter={post.data}&gt;
+  &lt;Content /&gt;
+&lt;/BlogLayout&gt;</code></pre>
+
+<h2>性能优化建议</h2>
+
+<ul>
+<li><strong>图片优化</strong>：使用 Astro 内置的 <code>&lt;Image /&gt;</code> 组件自动生成 WebP/AVIF 格式</li>
+<li><strong>Font Optimization</strong>：通过 <code>@fontsource</code> 本地化字体，避免 Google Fonts 的额外请求</li>
+<li><strong>Prefetch</strong>：利用 <code>&lt;link rel="prefetch"&gt;</code> 预加载可能的下一页</li>
+<li><strong>View Transitions</strong>：Astro 3.0+ 内置页面过渡动画，SPA 般丝滑</li>
+</ul>
+
+<h2>部署到 Cloudflare Pages</h2>
+
+<p>Astro 对 Cloudflare Pages 的支持近乎完美。连接 GitHub 仓库后，设置构建命令 <code>npm run build</code> 和输出目录 <code>dist</code>，每次推送自动部署。免费套餐包含无限带宽和全球 CDN，个人博客完全够用。</p>
+
+<p>Astro 生态还在快速成长。如果你正在考虑搭建下一个静态站点，不妨试试 Astro——它可能会是你用过最愉快的 SSG 框架。</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <div class="footer-links">
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

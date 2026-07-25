@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog</title>
+<meta name="description" content="分享日常使用大语言模型时积累的 Prompt Engineering 实践心得，涵盖角色设定、结构化输出与思维链技巧。">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0d0b1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e6f0;
+    --text-secondary: #9b97b8;
+    --accent: #a78bfa;
+    --accent2: #818cf8;
+    --gradient: linear-gradient(135deg, #a78bfa, #818cf8, #6366f1);
+    --gradient2: linear-gradient(135deg, #c084fc, #a78bfa);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(167,139,250,0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08), transparent);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+  @media(max-width:768px){ .container { padding:0 16px; } }
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(13,11,26,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text);
+    text-decoration: none; letter-spacing: -0.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--gradient);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+  }
+  .nav { display: flex; gap: 8px; }
+  .nav a {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 14px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    font-weight: 450;
+  }
+  .nav a:hover { color: var(--text); background: var(--surface-hover); }
+
+  article { padding: 60px 0 80px; }
+  .article-header { margin-bottom: 48px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    margin-bottom: 24px; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { width: 16px; height: 16px; }
+  .category-badge {
+    display: inline-flex;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--accent);
+    background: rgba(167,139,250,0.1);
+    padding: 3px 10px; border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .article-header h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800; line-height: 1.25; letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+  .article-meta {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: 14px; color: var(--text-secondary);
+  }
+  .article-meta span { display: flex; align-items: center; gap: 5px; }
+  .article-meta svg { width: 14px; height: 14px; opacity: 0.5; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 6px; color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .article-content { font-size: 16px; line-height: 1.85; }
+  .article-content h2 {
+    font-size: 24px; font-weight: 700; margin: 48px 0 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .article-content h3 {
+    font-size: 19px; font-weight: 650; margin: 32px 0 12px;
+  }
+  .article-content h4 {
+    font-size: 16px; font-weight: 600; margin: 24px 0 10px;
+  }
+  .article-content p { margin-bottom: 18px; color: #d4d0e8; }
+  .article-content strong { color: var(--text); font-weight: 650; }
+  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
+  .article-content li { margin-bottom: 8px; color: #d4d0e8; }
+  .article-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-size: 13px; padding: 2px 6px;
+    background: rgba(167,139,250,0.12);
+    border-radius: 4px; color: var(--accent);
+  }
+  .article-content pre {
+    margin: 20px 0; padding: 20px 24px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .article-content pre code {
+    background: none; padding: 0; color: #d4d0e8;
+    font-size: 13px;
+  }
+  .article-content blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 12px 20px; margin: 20px 0;
+    background: rgba(167,139,250,0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary); font-style: italic;
+  }
+  .article-content img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+
+  .footer {
+    border-top: 1px solid var(--border); padding: 40px 0;
+    margin-top: 40px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">L</div>
+        LoveYX Blog
+      </a>
+      <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="index.html#posts">文章</a>
+        <a href="index.html#about">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article>
+        <div class="article-header">
+          <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+            返回首页
+          </a>
+          <div class="category-badge">AI</div>
+          <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
+          <div class="article-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-14</span>
+            <span>AI</span>
+          </div>
+          <div class="tags" style="margin-top: 14px;"><span class="tag">AI</span><span class="tag">Prompt</span><span class="tag">LLM</span></div>
+        </div>
+        <div class="article-content">
+<h2>为什么 Prompt Engineering 重要</h2>
+
+<p>2026 年，大语言模型已经深度嵌入我们的日常工作流。但同样是 GPT-5 或 Claude 4，有人能拿到精准的结果，有人反复追问也得不到满意的回答。差距的核心就在于提示词（Prompt）的设计。</p>
+
+<p>Prompt Engineering 不是玄学，而是一套可复用的方法论。以下是我在数百次实践中沉淀下来的核心技巧。</p>
+
+<h2>技巧一：角色设定决定输出质量</h2>
+
+<p>一个最简单的实验：让 LLM 写一段产品文案。</p>
+
+<p><strong>差的 Prompt</strong>：<code>帮我写一段蓝牙耳机的介绍。</code></p>
+
+<p><strong>好的 Prompt</strong>：<code>你是一位资深消费电子文案写手，擅长用简洁有力的语言突出产品卖点。请为以下蓝牙耳机撰写一段 150 字以内的产品介绍，目标用户是 25-35 岁的都市白领。</code></p>
+
+<p>差距是巨大的。角色设定为模型提供了「思考框架」——它会自动选择符合该角色的语气、词汇深度和内容结构。</p>
+
+<pre><code># System Prompt 示例
+你是一位资深的 Python 代码审查者（Code Reviewer）。
+你的审查风格：
+- 优先关注安全问题（注入、越权、敏感信息泄露）
+- 其次关注性能瓶颈（算法复杂度、内存使用）
+- 最后关注代码风格（命名、注释、结构）
+- 每条建议附带修改方案和理由</code></pre>
+
+<h2>技巧二：结构化输出是必选项</h2>
+
+<p>不要只说「给我一个结果」。明确指定你想要的输出格式：</p>
+
+<p><strong>模糊版</strong>：<code>总结这篇文章的要点。</code></p>
+
+<p><strong>结构化版</strong>：</p>
+
+<pre><code>请用以下 JSON 格式输出总结：
+{
+  "title": "文章核心主题（10字以内）",
+  "key_points": ["要点1", "要点2", "要点3"],
+  "recommended_action": "建议读者下一步做什么",
+  "difficulty": "入门/进阶/专家"
+}</code></pre>
+
+<p>当你需要批量处理时，一致的输出格式可以让你用脚本自动解析结果。</p>
+
+<h2>技巧三：思维链（Chain of Thought）</h2>
+
+<p>对于需要推理的任务，显式要求模型「一步步思考」：</p>
+
+<pre><code>prompt = """
+问题：某公司第一季度收入 120 万，成本 80 万。
+第二季度收入增长 25%，成本保持不变。
+请问上半年利润率是多少？
+
+请按以下步骤分析：
+1. 计算第二季度收入
+2. 计算上半年总收入
+3. 计算上半年总成本
+4. 计算利润和利润率
+"""</code></pre>
+
+<p>思维链不仅提高了准确率，还让你能追踪模型的推理过程，快速定位错误。</p>
+
+<h2>技巧四：Few-Shot 示例胜过千言万语</h2>
+
+<p>与其描述你想要的风格，不如给 2-3 个示例：</p>
+
+<pre><code>请将以下技术术语用通俗语言解释，参考示例：
+
+示例1
+术语：API
+解释：API 就像是餐厅里的服务员——你告诉服务员你要什么菜，
+服务员去后厨帮你取，你不需要知道厨房里是怎么运作的。
+
+示例2
+术语：数据库索引
+解释：索引就像书的目录——你想找某个章节，翻目录比一页页翻书快得多。
+
+现在请解释：微服务架构</code></pre>
+
+<h2>实践总结</h2>
+
+<p>Prompt Engineering 的精髓不在于背模板，而在于理解模型的「思维方式」——给它足够清晰的边界、足够具体的期望、足够典型的参考，它自然会给出高质量的结果。每一次与 AI 的交互，其实都是一次对自我表达能力的训练。</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <div class="footer-links">
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
