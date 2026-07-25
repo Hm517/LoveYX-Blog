@@ -20,7 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v4
-      - run: mkdir -p _site && cp -r index.html CNAME _site/ 2>/dev/null; cp index.html _site/ 2>/dev/null; true
+      - run: |
+          mkdir -p _site
+          cp index.html _site/
+          test -f CNAME && cp CNAME _site/ || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site
