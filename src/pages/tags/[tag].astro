@@ -2,9 +2,9 @@
 // tags/[tag].astro — 标签详情页
 // 根据标签过滤文章列表
 import { getCollection } from "astro:content";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import BlogList from "../../../components/BlogList.astro";
-import Footer from "../../../components/Footer.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogList from "../../components/BlogList.astro";
+import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => {
