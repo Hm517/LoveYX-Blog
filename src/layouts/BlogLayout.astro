@@ -39,21 +39,32 @@ const updDate = updated ? formatDate(updated) : null;
 >
   <article class="flex-1">
     <!-- Header -->
-    <header class="container-main py-12 sm:py-16">
+    <header class="container-main py-16 sm:py-20">
       <!-- Category & Tags -->
-      <div class="flex flex-wrap items-center gap-3 mb-6">
+      <div class="flex flex-wrap items-center gap-3 mb-8">
         {category && (
           <a
             href={`/categories/${String(category).toLowerCase()}/`}
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition no-underline"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full
+                   text-xs font-semibold tracking-wide no-underline
+                   transition-all duration-300 hover:scale-105 hover:shadow-sm"
+            style="color: var(--color-accent);
+                   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+                   border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);"
           >
+            <span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-accent)"></span>
             {category}
           </a>
         )}
         {tags?.map((tag: string) => (
           <a
             href={`/tags/${tag.toLowerCase()}/`}
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-card text-muted hover:text-text transition no-underline"
+            class="inline-flex items-center px-3 py-1.5 rounded-full
+                   text-xs font-medium no-underline
+                   transition-all duration-300 hover:scale-105 hover:shadow-sm"
+            style="color: var(--color-muted);
+                   background: var(--color-surface);
+                   border: 1px solid var(--color-border);"
           >
             #{tag}
           </a>
@@ -61,25 +72,51 @@ const updDate = updated ? formatDate(updated) : null;
       </div>
 
       <!-- Title -->
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-6">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-8"
+          style="color: var(--color-text)">
         {title}
       </h1>
 
       <!-- Meta -->
-      <div class="flex flex-wrap items-center gap-4 text-sm text-muted">
-        <time datetime={date.toISOString()}>发布于 {pubDate}</time>
-        {updDate && <span>更新于 {updDate}</span>}
-        <span class="text-accent/70">{readingTime} 分钟阅读</span>
+      <div class="flex flex-wrap items-center gap-5 text-sm"
+           style="color: var(--color-muted)">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
+               stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <time datetime={date.toISOString()}>{pubDate}</time>
+        </div>
+        {updDate && (
+          <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
+                 stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>{updDate}</span>
+          </div>
+        )}
+        <div class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor"
+               stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>{readingTime} 分钟阅读</span>
+        </div>
       </div>
 
       <!-- Cover Image -->
       {cover && (
-        <div class="mt-8 -mx-4 sm:mx-0">
+        <div class="mt-10 -mx-4 sm:mx-0">
           <img
             src={cover}
             alt={title}
-            class="w-full rounded-xl object-cover"
+            class="w-full rounded-2xl object-cover shadow-2xl"
             loading="eager"
+            style="max-height: 480px;"
           />
         </div>
       )}
@@ -87,30 +124,50 @@ const updDate = updated ? formatDate(updated) : null;
 
     <!-- Content -->
     <div class="container-main pb-12">
-      <div class="prose prose-invert max-w-none
-        prose-headings:text-text prose-headings:font-semibold
-        prose-p:text-text/90 prose-p:leading-relaxed
-        prose-li:text-text/90
-        prose-strong:text-text
-        prose-blockquote:border-l-accent prose-blockquote:text-muted
-        prose-img:rounded-xl prose-img:mx-auto
+      <div class="prose prose-lg max-w-none
+        prose-headings:text-text prose-headings:font-bold prose-headings:tracking-tight
+        prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6
+        prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
+        prose-p:text-text/90 prose-p:leading-relaxed prose-p:my-5
+        prose-li:text-text/90 prose-li:my-1.5
+        prose-strong:text-text prose-strong:font-semibold
+        prose-blockquote:border-l-4 prose-blockquote:border-accent
+        prose-blockquote:text-muted prose-blockquote:italic
+        prose-blockquote:bg-accent/3 prose-blockquote:rounded-r-xl prose-blockquote:py-3 prose-blockquote:px-6
+        prose-img:rounded-2xl prose-img:mx-auto prose-img:shadow-lg
         prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-        prose-code:text-accent prose-code:bg-card prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-        prose-pre:bg-card prose-pre:border prose-pre:border-white/5">
+        prose-code:before:content-none prose-code:after:content-none
+        prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-pre:rounded-xl
+        prose-table:rounded-xl prose-table:overflow-hidden
+        prose-th:bg-surface prose-th:py-3 prose-th:px-4
+        prose-td:py-2.5 prose-td:px-4
+        prose-hr:border-border">
         <slot />
       </div>
     </div>
 
     <!-- Prev / Next Navigation -->
     <nav class="container-main pb-12">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8"
+           style="border-top: 1px solid var(--color-border);">
         {prevEntry ? (
           <a
             href={`/blog/${prevEntry.id}/`}
-            class="group p-4 rounded-xl bg-card hover:bg-card/80 transition no-underline"
+            class="group p-5 rounded-2xl transition-all duration-300
+                   hover:-translate-y-0.5 hover:shadow-xl no-underline"
+            style="background: var(--color-surface); border: 1px solid var(--color-border);"
           >
-            <span class="text-xs text-muted">上一篇</span>
-            <p class="mt-1 text-sm font-medium text-text group-hover:text-accent transition line-clamp-2">
+            <div class="flex items-center gap-1.5 mb-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                   stroke-width="2" viewBox="0 0 24 24"
+                   style="color: var(--color-muted)">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>
+              <span class="text-xs font-medium" style="color: var(--color-muted)">上一篇</span>
+            </div>
+            <p class="text-sm font-semibold leading-snug line-clamp-2
+                      transition-colors duration-300 group-hover:text-accent"
+               style="color: var(--color-text)">
               {prevEntry.data.title}
             </p>
           </a>
@@ -120,10 +177,21 @@ const updDate = updated ? formatDate(updated) : null;
         {nextEntry ? (
           <a
             href={`/blog/${nextEntry.id}/`}
-            class="group p-4 rounded-xl bg-card hover:bg-card/80 transition no-underline text-right"
+            class="group p-5 rounded-2xl transition-all duration-300
+                   hover:-translate-y-0.5 hover:shadow-xl no-underline text-right"
+            style="background: var(--color-surface); border: 1px solid var(--color-border);"
           >
-            <span class="text-xs text-muted">下一篇</span>
-            <p class="mt-1 text-sm font-medium text-text group-hover:text-accent transition line-clamp-2">
+            <div class="flex items-center justify-end gap-1.5 mb-2">
+              <span class="text-xs font-medium" style="color: var(--color-muted)">下一篇</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                   stroke-width="2" viewBox="0 0 24 24"
+                   style="color: var(--color-muted)">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+            <p class="text-sm font-semibold leading-snug line-clamp-2
+                      transition-colors duration-300 group-hover:text-accent"
+               style="color: var(--color-text)">
               {nextEntry.data.title}
             </p>
           </a>
@@ -135,11 +203,18 @@ const updDate = updated ? formatDate(updated) : null;
 
     <!-- Giscus Comments -->
     <div class="container-main pb-16">
-      <div class="border-t border-white/5 pt-8">
-        <!-- Giscus 评论占位 — 部署后填入你的 repo 信息 -->
-        <p class="text-center text-sm text-muted">
-          评论功能（Giscus）— 部署后配置 GitHub Discussions 即可启用
-        </p>
+      <div class="pt-8" style="border-top: 1px solid var(--color-border);">
+        <div class="text-center py-8 rounded-2xl"
+             style="background: var(--color-surface); border: 1px solid var(--color-border);">
+          <svg class="w-8 h-8 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor"
+               stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--color-muted)">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+          </svg>
+          <p class="text-sm" style="color: var(--color-muted)">
+            评论功能 (Giscus) — 部署后配置 GitHub Discussions 即可启用
+          </p>
+        </div>
       </div>
     </div>
   </article>

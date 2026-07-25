@@ -28,8 +28,22 @@ const tags = Array.from(tagMap.entries())
 >
   <main class="flex-1 pt-24 pb-12">
     <div class="max-w-6xl mx-auto px-6">
-      <h1 class="text-3xl font-bold text-text mb-2">标签</h1>
-      <p class="text-muted mb-10">共 {tags.length} 个标签</p>
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" style="color: var(--color-accent)">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+            </svg>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
+              style="color: var(--color-text)">标签</h1>
+        </div>
+        <p class="text-sm" style="color: var(--color-muted)">共 {tags.length} 个标签</p>
+      </header>
 
       {tags.length > 0 ? (
         <div class="flex flex-wrap gap-3">

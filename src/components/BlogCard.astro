@@ -38,66 +38,98 @@ const displayDate = new Date(date).toLocaleDateString('zh-CN', {
 <article class="group">
   <a href={`/blog/${slug}`} class="block">
     <div
-      class="bg-card rounded-xl overflow-hidden border border-card hover:border-muted/20
-             transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+      class="relative rounded-2xl overflow-hidden
+             border transition-all duration-500
+             hover:-translate-y-1.5 hover:shadow-2xl"
+      style="background: var(--color-surface); border-color: var(--color-border);"
     >
       <!-- Cover Image -->
       {cover && (
-        <div class="aspect-video overflow-hidden">
+        <div class="aspect-video overflow-hidden relative shimmer">
           <img
             src={cover}
             alt={title}
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            class="w-full h-full object-cover transition-transform duration-700
+                   group-hover:scale-110"
             loading="lazy"
           />
+          <!-- 图片渐变遮罩 -->
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] to-transparent
+                      opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+          </div>
         </div>
       )}
 
-      <div class="p-5">
+      <div class="p-6">
         <!-- Category Badge -->
         {category && (
-          <span
-            class="inline-block text-xs font-medium text-accent bg-accent/10 rounded-full px-3 py-0.5 mb-3"
-          >
+          <span class="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full
+                       text-xs font-semibold tracking-wide
+                       border transition-all duration-300
+                       group-hover:shadow-sm"
+                style="color: var(--color-accent);
+                       background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+                       border-color: color-mix(in srgb, var(--color-accent) 15%, transparent);">
+            <span class="w-1.5 h-1.5 rounded-full"
+                  style="background: var(--color-accent)"></span>
             {category}
           </span>
         )}
 
         <!-- Title -->
-        <h3
-          class="text-lg font-semibold text-text leading-snug group-hover:text-accent transition-colors line-clamp-2"
-        >
+        <h3 class="text-lg font-bold leading-snug line-clamp-2
+                   transition-colors duration-300 group-hover:text-accent"
+            style="color: var(--color-text)">
           {title}
         </h3>
 
         <!-- Description -->
         {description && (
-          <p class="mt-2 text-sm text-muted leading-relaxed line-clamp-2">
+          <p class="mt-2.5 text-sm leading-relaxed line-clamp-2"
+             style="color: var(--color-muted)">
             {description}
           </p>
         )}
 
         <!-- Meta Row -->
-        <div class="mt-4 flex items-center gap-3 text-xs text-muted">
-          <time datetime={date}>{displayDate}</time>
+        <div class="mt-4 flex items-center gap-3 text-xs"
+             style="color: var(--color-muted)">
+          <div class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                 stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <time datetime={date}>{displayDate}</time>
+          </div>
           {readingTime && (
-            <>
-              <span>&middot;</span>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                   stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
               <span>{readingTime}</span>
-            </>
+            </div>
           )}
         </div>
 
         <!-- Tags -->
         {tags.length > 0 && (
-          <div class="mt-3 flex flex-wrap gap-2">
+          <div class="mt-4 pt-4 flex flex-wrap gap-2"
+               style="border-top: 1px solid var(--color-border)">
             {tags.slice(0, 3).map((tag) => (
-              <span class="text-xs text-muted bg-bg rounded-md px-2 py-0.5">
+              <span class="text-xs rounded-lg px-2.5 py-1 transition-colors duration-200
+                           group-hover:bg-accent/5"
+                    style="color: var(--color-muted); background: var(--color-bg);">
                 #{tag}
               </span>
             ))}
             {tags.length > 3 && (
-              <span class="text-xs text-muted">+{tags.length - 3}</span>
+              <span class="text-xs rounded-lg px-2.5 py-1"
+                    style="color: var(--color-muted); background: var(--color-bg);">
+                +{tags.length - 3}
+              </span>
             )}
           </div>
         )}

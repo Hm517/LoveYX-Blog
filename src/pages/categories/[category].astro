@@ -1,6 +1,5 @@
 ---
-// tags/[tag].astro — 标签详情页
-// 根据标签过滤文章列表
+// categories/[category].astro — 分类详情页
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BlogList from "../../components/BlogList.astro";
@@ -11,27 +10,25 @@ export async function getStaticPaths() {
     return import.meta.env.PROD ? !data.draft : true;
   });
 
-  const tagSet = new Set<string>();
+  const catSet = new Set<string>();
   posts.forEach((post) => {
-    post.data.tags?.forEach((tag) => tagSet.add(tag));
+    if (post.data.category) catSet.add(post.data.category);
   });
 
-  return Array.from(tagSet).map((tag) => ({
-    params: { tag },
-    props: { tag },
+  return Array.from(catSet).map((cat) => ({
+    params: { category: cat.toLowerCase() },
+    props: { category: cat },
   }));
 }
 
-const { tag } = Astro.props;
+const { category } = Astro.props;
 
 const allPosts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? !data.draft : true;
 });
 
 const filteredPosts = allPosts
-  .filter((post) =>
-    post.data.tags?.some((t) => t.toLowerCase() === tag.toLowerCase())
-  )
+  .filter((post) => post.data.category?.toLowerCase() === category.toLowerCase())
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 const postItems = filteredPosts.map((post) => {
@@ -53,8 +50,8 @@ const postItems = filteredPosts.map((post) => {
 ---
 
 <BaseLayout
-  title={`标签: ${tag}`}
-  canonicalURL={new URL(`/tags/${encodeURIComponent(tag)}/`, Astro.site).href}
+  title={`分类: ${category}`}
+  canonicalURL={new URL(`/categories/${encodeURIComponent(category)}/`, Astro.site).href}
 >
   <main class="flex-1 pt-24 pb-12">
     <div class="max-w-6xl mx-auto px-6">
@@ -65,19 +62,16 @@ const postItems = filteredPosts.map((post) => {
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                  viewBox="0 0 24 24" style="color: var(--color-accent)">
               <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+                    d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
             </svg>
           </div>
           <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
-              style="color: var(--color-text)">
-            <span style="color: var(--color-accent)">#</span>{tag}
-          </h1>
+              style="color: var(--color-text)">{category}</h1>
         </div>
         <p class="text-sm" style="color: var(--color-muted)">
           共 {filteredPosts.length} 篇文章
-          <a href="/tags" class="ml-3 text-accent opacity-70 hover:opacity-100 transition-opacity hover:no-underline no-underline">
-            &larr; 所有标签
+          <a href="/categories" class="ml-3 text-accent opacity-70 hover:opacity-100 transition-opacity hover:no-underline no-underline">
+            &larr; 所有分类
           </a>
         </p>
       </header>

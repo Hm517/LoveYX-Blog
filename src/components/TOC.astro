@@ -20,18 +20,28 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
 {tocHeadings.length > 0 && (
-  <nav class="hidden xl:block sticky top-24 w-full max-w-[220px] ml-8">
-    <h4 class="text-xs font-semibold text-muted uppercase tracking-wider mb-4">
-      目录
-    </h4>
-    <ul class="space-y-1.5 text-sm border-l border-muted/20 pl-4" id="toc-list">
+  <nav class="hidden xl:block sticky top-24 w-full max-w-[240px] ml-8">
+    <div class="flex items-center gap-2 mb-4">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" style="color: var(--color-accent)">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+      </svg>
+      <h4 class="text-xs font-semibold uppercase tracking-wider"
+          style="color: var(--color-muted)">
+        目录
+      </h4>
+    </div>
+
+    <ul class="space-y-0.5 text-sm" id="toc-list"
+        style="border-left: 2px solid var(--color-border); padding-left: 1rem;">
       {tocHeadings.map((h) => (
         <li>
           <a
             href={`#${h.slug}`}
             data-toc-slug={h.slug}
-            class="block text-muted hover:text-text transition-colors py-0.5 truncate"
-            style={`padding-left: ${(h.depth - 2) * 12}px`}
+            class="block rounded-lg transition-all duration-200 text-xs sm:text-sm py-1.5 truncate hover:no-underline"
+            style={`padding-left: ${(h.depth - 2) * 14}px; color: var(--color-muted);`}
           >
             {h.text}
           </a>
@@ -55,10 +65,17 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            const link = document.querySelector(`[data-toc-slug="${entry.target.id}"]`);
+            const link = document.querySelector(`[data-toc-slug="${entry.target.id}"]`) as HTMLElement;
             if (link) {
-              link.classList.toggle('text-accent', entry.isIntersecting);
-              link.classList.toggle('text-muted', !entry.isIntersecting);
+              if (entry.isIntersecting) {
+                link.style.color = 'var(--color-accent)';
+                link.style.fontWeight = '500';
+                link.style.background = 'color-mix(in srgb, var(--color-accent) 8%, transparent)';
+              } else {
+                link.style.color = 'var(--color-muted)';
+                link.style.fontWeight = '';
+                link.style.background = '';
+              }
             }
           });
         },

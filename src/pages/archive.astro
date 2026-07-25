@@ -1,6 +1,5 @@
 ---
 // archive.astro — 归档页
-// 按年份分组展示所有文章，时间线形式
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Footer from "../components/Footer.astro";
@@ -37,27 +36,54 @@ function formatDate(d: Date) {
 >
   <main class="flex-1 pt-24 pb-12">
     <div class="max-w-3xl mx-auto px-6">
-      <h1 class="text-3xl font-bold text-text mb-2">归档</h1>
-      <p class="text-muted mb-10">共 {sortedPosts.length} 篇文章</p>
+      <header class="mb-12">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+               style="background: color-mix(in srgb, var(--color-accent) 12%, transparent);">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" style="color: var(--color-accent)">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+            </svg>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight"
+              style="color: var(--color-text)">归档</h1>
+        </div>
+        <p class="text-sm" style="color: var(--color-muted)">
+          共 {sortedPosts.length} 篇文章
+        </p>
+      </header>
 
       {archives.length > 0 ? (
-        <div class="space-y-12">
+        <div class="space-y-16">
           {archives.map(([year, yearPosts]) => (
             <section>
-              <h2 class="text-2xl font-bold text-accent mb-6">{year}</h2>
-              <div class="space-y-4">
+              <h2 class="text-2xl font-bold mb-6 flex items-center gap-4"
+                  style="color: var(--color-accent)">
+                <span>{year}</span>
+                <span class="flex-1 h-px" style="background: color-mix(in srgb, var(--color-accent) 25%, transparent);"></span>
+                <span class="text-sm font-normal" style="color: var(--color-muted)">
+                  {yearPosts.length} 篇
+                </span>
+              </h2>
+              <div class="grid gap-2">
                 {yearPosts.map((post) => (
                   <a
                     href={`/blog/${post.id}/`}
-                    class="group flex items-baseline gap-6 py-3 border-b border-card hover:border-muted/20 transition-colors"
+                    class="group flex items-baseline gap-6 p-4 rounded-xl
+                           transition-all duration-300 hover:-translate-x-1 hover:shadow-md no-underline"
+                    style="background: var(--color-surface); border: 1px solid var(--color-border);"
                   >
                     <time
-                      class="text-sm text-muted shrink-0 w-20"
+                      class="text-sm shrink-0 w-20 font-mono"
+                      style="color: var(--color-muted)"
                       datetime={post.data.date.toISOString()}
                     >
                       {formatDate(post.data.date)}
                     </time>
-                    <span class="text-text group-hover:text-accent transition-colors line-clamp-1">
+                    <span class="min-w-0 truncate text-sm font-medium
+                                 transition-colors duration-300 group-hover:text-accent"
+                          style="color: var(--color-text)">
                       {post.data.title}
                     </span>
                   </a>
@@ -68,7 +94,15 @@ function formatDate(d: Date) {
         </div>
       ) : (
         <div class="text-center py-20">
-          <p class="text-muted text-lg">暂无文章</p>
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+               style="background: var(--color-surface); border: 1px solid var(--color-border);">
+            <svg class="w-8 h-8 opacity-30" fill="none" stroke="currentColor"
+                 stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--color-muted)">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-lg" style="color: var(--color-muted)">暂无文章</p>
         </div>
       )}
     </div>

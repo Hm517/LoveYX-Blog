@@ -13,34 +13,49 @@ const navLinks = [
 ---
 
 <header
-  class="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-bg/80 border-b border-card"
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+  style="background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+         backdrop-filter: blur(24px) saturate(180%);
+         -webkit-backdrop-filter: blur(24px) saturate(180%);
+         border-bottom: 1px solid var(--color-border);"
 >
   <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
     <!-- Logo -->
     <a
       href="/"
-      class="text-xl font-bold tracking-tight text-text hover:text-accent transition-colors"
+      class="flex items-center gap-2 text-xl font-extrabold tracking-tight
+             transition-all duration-300 hover:scale-105"
+      style="color: var(--color-text)"
     >
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white"
+            style="background: linear-gradient(135deg, var(--color-accent), #7c3aed);">
+        L
+      </span>
       LoveYX
     </a>
 
     <!-- Desktop Links -->
-    <div class="hidden md:flex items-center gap-8">
+    <div class="hidden md:flex items-center gap-1">
       {navLinks.map((link) => (
         <a
           href={link.href}
-          class="text-sm text-muted hover:text-text transition-colors"
+          class="relative px-4 py-2 text-sm font-medium rounded-lg
+                 transition-all duration-200"
+          style="color: var(--color-muted)"
         >
           {link.label}
         </a>
       ))}
+
+      <div class="w-px h-5 mx-1" style="background: var(--color-border)"></div>
 
       <!-- GitHub Icon -->
       <a
         href="https://github.com"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-muted hover:text-text transition-colors"
+        class="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+        style="color: var(--color-muted)"
         aria-label="GitHub"
       >
         <svg
@@ -66,7 +81,8 @@ const navLinks = [
       <ThemeToggle />
       <button
         id="mobile-menu-btn"
-        class="text-muted hover:text-text transition-colors"
+        class="p-2 rounded-lg transition-colors"
+        style="color: var(--color-muted)"
         aria-label="打开菜单"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -80,13 +96,15 @@ const navLinks = [
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden md:hidden bg-card border-t border-card"
+    class="hidden md:hidden border-t"
+    style="background: var(--color-surface); border-color: var(--color-border);"
   >
-    <div class="px-6 py-4 flex flex-col gap-3">
+    <div class="px-6 py-4 flex flex-col gap-1">
       {navLinks.map((link) => (
         <a
           href={link.href}
-          class="text-sm text-muted hover:text-text transition-colors py-1"
+          class="text-sm font-medium rounded-lg px-3 py-2.5 transition-colors"
+          style="color: var(--color-muted)"
         >
           {link.label}
         </a>
@@ -95,7 +113,8 @@ const navLinks = [
         href="https://github.com"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-sm text-muted hover:text-text transition-colors py-1"
+        class="text-sm font-medium rounded-lg px-3 py-2.5 transition-colors"
+        style="color: var(--color-muted)"
       >
         GitHub
       </a>
