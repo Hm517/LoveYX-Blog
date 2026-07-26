@@ -25,6 +25,8 @@ jobs:
           cp index.html _site/
           cp *.html _site/ 2>/dev/null || true
           cp -r images _site/ 2>/dev/null || true
+          cp favicon.ico favicon-*.png apple-touch-icon.png android-chrome-*.png site.webmanifest _site/ 2>/dev/null || true
+          cp -r public/* _site/ 2>/dev/null || true
           test -f CNAME && cp CNAME _site/ || true
       - uses: actions/upload-pages-artifact@v3
         with:
