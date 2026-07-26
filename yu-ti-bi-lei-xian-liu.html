@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欲提笔，泪先流 — LoveYX Blog</title>
+<meta name="description" content="关于外公的回忆，欲提笔，泪先流。">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Gaegu&display=swap');
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --pink: #f8a5c2;
+    --peach: #fab1a0;
+    --lavender: #c8a2c8;
+    --cream: #fdf6f0;
+    --mint: #b2d8c8;
+    --bg: #fff5f0;
+    --surface: rgba(255,245,240,0.65);
+    --surface-hover: rgba(255,235,225,0.85);
+    --border: rgba(248,165,194,0.22);
+    --text: #5c4a5e;
+    --text-secondary: #8a7a8b;
+    --accent: #f8a5c2;
+    --accent2: #c8a2c8;
+    --gradient: linear-gradient(135deg, #f8a5c2, #fab1a0, #c8a2c8);
+    --gradient2: linear-gradient(135deg, #fab1a0, #f8a5c2);
+    --radius: 24px;
+    --radius-sm: 16px;
+  }
+  html { scroll-behavior:smooth; font-size:16px; }
+  body {
+    font-family: 'ZCOOL XiaoWei', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    min-height: 100vh;
+    overflow-x: hidden;
+    letter-spacing: 0.3px;
+  }
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(248,165,194,0.14), transparent),
+      radial-gradient(ellipse 50% 35% at 80% 100%, rgba(200,162,200,0.12), transparent);
+  }
+  .container { max-width:800px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+  @media(max-width:768px){ .container { padding:0 16px; } }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255,245,240,0.75);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 20px rgba(248,165,194,0.06);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 19px; font-weight: 700; color: var(--text);
+    text-decoration: none;
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    letter-spacing: 0.5px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--gradient);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff;
+    box-shadow: 0 4px 18px rgba(248,165,194,0.35);
+  }
+  .nav { display: flex; gap: 6px; }
+  .nav a {
+    padding: 8px 18px; border-radius: 22px;
+    font-size: 14px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.25s;
+    font-weight: 500;
+  }
+  .nav a:hover {
+    color: var(--pink);
+    background: rgba(248,165,194,0.12);
+    transform: translateY(-1px);
+  }
+
+  article { padding: 50px 0 70px; }
+  .article-header { margin-bottom: 48px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; color: var(--text-secondary); text-decoration: none;
+    margin-bottom: 28px; transition: color 0.25s;
+    padding: 6px 14px; border-radius: 20px;
+    background: rgba(248,165,194,0.06);
+  }
+  .back-link:hover {
+    color: var(--pink);
+    background: rgba(248,165,194,0.14);
+  }
+  .back-link svg { width: 16px; height: 16px; }
+
+  .category-badge {
+    display: inline-flex;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.8px; color: var(--pink);
+    background: rgba(248,165,194,0.12);
+    padding: 4px 12px; border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .article-header h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 700; line-height: 1.3;
+    margin-bottom: 20px;
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    color: #4a3a4c;
+  }
+  .article-meta {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: 14px; color: var(--text-secondary);
+  }
+  .article-meta span { display: flex; align-items: center; gap: 5px; }
+  .article-meta svg { width: 14px; height: 14px; opacity: 0.45; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 4px 10px;
+    border-radius: 12px; color: var(--text-secondary);
+    border: 1px solid rgba(248,165,194,0.18);
+    background: rgba(248,165,194,0.06);
+    transition: all 0.2s;
+  }
+
+  .article-header::after {
+    content: '';
+    display: block;
+    width: 60px; height: 3px;
+    background: var(--gradient);
+    border-radius: 4px;
+    margin-top: 28px;
+  }
+
+  .article-content {
+    font-size: 16px; line-height: 1.95;
+    background: rgba(255,245,240,0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  @media(max-width:640px){ .article-content { padding: 24px 20px; } }
+  .article-content h2 {
+    font-size: 24px; font-weight: 700; margin: 48px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(248,165,194,0.25);
+    font-family: 'Gaegu', 'ZCOOL XiaoWei', cursive;
+    color: #4a3a4c;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .article-content h2::before {
+    content: '\2728';
+    font-size: 18px;
+  }
+  .article-content h3 {
+    font-size: 19px; font-weight: 650; margin: 32px 0 14px;
+    color: var(--lavender);
+  }
+  .article-content h4 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+  .article-content p { margin-bottom: 18px; color: var(--text); line-height: 1.95; }
+  .article-content strong { color: var(--pink); font-weight: 650; }
+  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
+  .article-content li { margin-bottom: 9px; color: var(--text); line-height: 1.8; }
+  .article-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+    font-size: 13px; padding: 2px 7px;
+    background: rgba(248,165,194,0.12);
+    border-radius: 6px; color: var(--lavender);
+  }
+  .article-content pre {
+    margin: 20px 0; padding: 20px 24px;
+    background: rgba(255,245,240,0.6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .article-content pre code {
+    background: none; padding: 0; color: var(--text);
+    font-size: 13px;
+  }
+  .article-content blockquote {
+    border-left: 4px solid var(--pink);
+    padding: 14px 22px; margin: 22px 0;
+    background: rgba(248,165,194,0.08);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  .article-content img {
+    max-width:100%; border-radius: var(--radius-sm);
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(248,165,194,0.12);
+  }
+
+  .footer {
+    border-top: 2px dashed rgba(248,165,194,0.3);
+    padding: 40px 0;
+    margin-top: 50px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a {
+    font-size: 13px; color: var(--text-secondary);
+    text-decoration: none; transition: all 0.2s;
+    padding: 4px 8px; border-radius: 10px;
+  }
+  .footer-links a:hover { color: var(--pink); background: rgba(248,165,194,0.08); }
+  .footer::after {
+    content: '\2763\FE0F \2728 \273F \FE0F';
+    display: block; text-align: center; font-size: 14px;
+    margin-top: 12px; letter-spacing: 8px; color: rgba(248,165,194,0.35);
+  }
+
+  @keyframes fadeInUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">L</div>
+        LoveYX Blog
+      </a>
+      <nav class="nav">
+        <a href="index.html">首页</a>
+        <a href="index.html#posts">文章</a>
+        <a href="index.html#about">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article>
+        <div class="article-header">
+          <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+            返回首页
+          </a>
+          <div class="category-badge">随笔</div>
+          <h1>欲提笔，泪先流</h1>
+          <div class="article-meta">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-26</span>
+            <span>随笔</span>
+          </div>
+          <div class="tags" style="margin-top: 14px;">
+            <span class="tag">亲人</span>
+            <span class="tag">外公</span>
+            <span class="tag">回忆</span>
+          </div>
+        </div>
+        <div class="article-content">
+
+<p>欲提笔，泪先流。</p>
+<p>你说走就走了，连句话都没留。我只是想，这冗长的一生，再难与贯穿我整个童年的你相见，我便难免哽咽。</p>
+<p>小时候，我一直比外公矮。那时候总着急，想着快点长，长到跟外公一样，再超过他。后来我真的比他高了——比他高了六年。可那天我把头磕在地上的时候，他还是比我矮。他躺在那儿，不会再起来了。</p>
+<p>最疼我的外公，七十五。摔了一下，就没再醒过来。</p>
+<p>我还有好多话没跟你说呢。还想坐那张桌子边上，听你讲部队里的事。翻来覆去就那些，我小时候听着烦，现在想再听一遍，听一回就行。可是听不到了。我也没来得及对你尽什么孝。</p>
+<p>小时候是他带着我的。送上学，接放学，都是他。他自己兜里没几个钱，可一见我就摸口袋，一块两块的，有时候摸出五块，笑嘻嘻塞过来，叫我去买吃的。那会儿不知足，晚上等他睡着了，我偷偷去翻他脱下来的裤子口袋。</p>
+<p>十块，五块，一块。拿了就跑。</p>
+<p>我还以为他从来没发现。后来外婆跟我提起这件事，笑着说："你外公贼精，每天晚上睡觉前都要把零钱数一遍。"原来他什么都知道，就是没戳破。</p>
+<p>后来我大了，自己能挣钱了。给不少人花过钱，可真没怎么给外公花过。我从小拿了你那么多，可你，没用过我的。这件事我一直过不去。你走那天凌晨，我忽然醒了，心里慌得不行，说不上来什么感觉，就是胸口闷，闷到天亮。早上我妈来电话，就说了一句："外公走了。"</p>
+<p>我跟着舅舅赶紧往老家赶。路上我一直在糊弄自己，跟自己说，可能是弄错了，搞不好他只是睡着了。推开门看见他安安静静躺那儿，我还是接着骗自己——我就觉得他没走，就是睡着了。</p>
+<p>他们吼我，不让眼泪掉进棺材。我使劲擦，憋着，就想多看你几眼，看得清楚一点。心里头还有个傻念头：最后这一眼，能不能把你的样子死死记住。从给你擦身子、穿衣服，到放进棺材；从入殓到出水，再到要盖棺了——我都忍着没大声哭。我以为我真能忍住。直到盖棺那一刻，我妈拽着我，说别看。可我一转身，嘴角塌下去了，眼泪就下来了。我哭得喘不上气，哭得整个人都在抖。旁边人都在劝，说别哭了，外公会保佑你的。我根本听不进去。我就知道一件事：把我带大的那个人，没了，真没了。跪拜的时候我还在哭，哭到嗓子哑了，哭到身上一点劲都没了。后面不哭了，也不是说不难过了，就是眼泪干了。可眼泪干了，想还是想。</p>
+<p>外公生前是个特别爱干净的人。衣服穿得板板正正的，鞋擦得锃亮。可他躺冰棺里那几天，上面绑的公鸡拉了几坨屎，我红着眼一点一点给弄干净。我怕你弄脏了，也怕你嫌弃。</p>
+<p>我以前特别怕鬼，小时候连晚上自己走个路都不敢。可外公办丧事那几天，我一点也不怕。我甚至想，你要是能回来看看我就好了，哪怕就让我梦到一回。出殡那天，炮仗炸得耳朵疼，唢呐吹得人发慌，棺材慢慢抬起来了，我才反应过来——这次是真的把你送走了。往后，再也见不着了。眼泪根本不受控制，擦了又淌，擦了又淌。</p>
+<p>外公，你不用保佑我。你辛苦了一辈子，够够的了。去那头好好歇着吧，别再疼了，别再累了。</p>
+<p>现在回头想，我最后悔的不是挣得少，不是没混出什么名堂，是总觉得日子还长。总觉得下次再回去看你，下次再说。结果呢，有些面，见完就真没了。你走得太急了，急到连声招呼都没打，什么都没交代，我连个"再见"都没好好跟你说。</p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <div class="footer-links">
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
