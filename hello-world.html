@@ -274,25 +274,25 @@
           <div class="tags" style="margin-top: 14px;"><span class="tag">博客</span><span class="tag">Astro</span></div>
         </div>
         <div class="article-content">
-<h2>为什么要搭建自己的博客</h2>
+<h2>为什么要搭自己的博客</h2>
 
-<p>2026 年的互联网，内容创作平台已经极度成熟。公众号、知乎、Notion、Medium——每个平台都在争夺我们的注意力。然而，我始终认为独立博客有着不可替代的价值。</p>
+<p>2026 年了，公众号、知乎、Notion、Medium 这些平台一个比一个成熟，说实话在上面写东西也挺方便。但我还是觉得，自己搭个博客这件事，有些东西是平台给不了的。</p>
 
-<p>首先，<strong>数据自主权</strong>。在第三方平台写作，你的内容随时可能因为平台策略变更而消失。独立博客意味着你拥有每一篇文章、每一张图片的完整控制权。域名是你的，服务器是你的（或者说 GitHub 上那个仓库是你的），没有算法会决定你的文章该不该被推荐。</p>
+<p>第一个就是 <strong>数据自主权</strong>。你在别人家平台上写的东西，哪天平台策略一改、说关就关，你的文章可能就没了。自己的博客不一样——域名是你的，GitHub 上那个仓库是你的，没有算法替你决定这篇文章值不值得被看到。</p>
 
-<p>其次，<strong>技术表达的纯粹性</strong>。作为一个程序员，我在写作时经常需要嵌入代码块、数学公式，甚至交互式图表。大多数内容平台对代码高亮的支持参差不齐，更不用说 Mermaid 流程图或 LaTeX 数学公式了。在自己的博客里，我可以完全掌控渲染管线。</p>
+<p>还有一个原因是 <strong>技术表达的自由度</strong>。我写东西经常要嵌代码块、数学公式，偶尔还想放个交互图表。大多数平台对代码高亮的支持只能说凑合，Mermaid 流程图和 LaTeX 公式就更别想了。在自己博客里，渲染管线我自己说了算。</p>
 
-<h2>为什么选择 Astro</h2>
+<h2>为什么选 Astro</h2>
 
-<p>市面上静态网站生成器很多——Hugo、Gatsby、Next.js、Hexo。最终选择 Astro 有三个核心理由：</p>
+<p>静态网站生成器太多了——Hugo、Gatsby、Next.js、Hexo 都有人用。我最后选了 Astro，主要被这几个地方戳中了：</p>
 
 <ul>
-<li><strong>Islands Architecture（群岛架构）</strong>：大部分内容纯静态，只在你需要交互的地方加载 JavaScript。这意味着页面默认零 JS，加载极快。</li>
-<li><strong>多框架兼容</strong>：同一项目可以混合使用 React、Vue、Svelte 组件，互不干扰。</li>
-<li><strong>一流的内容层</strong>：Astro 的 Content Collections 提供了类型安全的 Markdown/MDX 管理，配合 Zod schema 校验 frontmatter，再也不用担心文章元数据格式错误。</li>
+<li><strong>Islands Architecture（群岛架构）</strong>：大部分内容纯静态 HTML，只有需要交互的地方才加载 JS。页面默认零 JS，打开就是秒开。</li>
+<li><strong>多框架混用</strong>：同一个项目里 React、Vue、Svelte 组件可以各玩各的，互不影响。</li>
+<li><strong>Content Collections</strong>：Astro 的内容层做得真好。用 Zod schema 定义 frontmatter 结构，编辑器里能自动补全，构建时元数据格式错了直接报错。</li>
 </ul>
 
-<p>举一个简单的例子，定义一个博客文章的 frontmatter 类型：</p>
+<p>随便举个例子，定义一篇文章的 frontmatter 类型就这么简单：</p>
 
 <pre><code>// src/content/config.ts
 import { defineCollection, z } from 'astro:content';
@@ -311,24 +311,22 @@ const blogCollection = defineCollection({
 
 export const collections = { blog: blogCollection };</code></pre>
 
-<h2>博客的定位与未来</h2>
+<h2>这个博客会写什么</h2>
 
-<p>LoveYX Blog 的定位是「记录技术、AI、生活与思考」。我不会限定自己只写技术文章——摄影技巧、读书笔记、旅行见闻都会出现在这里。博客应该是完整的数字自我，而不是单一维度的技术手册。</p>
+<p>LoveYX Blog 的主题就是「技术、AI、生活和一些乱七八糟的想法」。我不打算只写技术文章——摄影技巧、读书笔记、去了哪儿玩了什么，都会往上放。一个博客就该是完整的自己，干嘛把自己圈死在单一话题里。</p>
 
-<p>接下来的计划包括：</p>
+<p>接下来要做的事情：</p>
 
 <ul>
-<li>完善标签系统和分类导航</li>
-<li>接入 Giscus 评论，让交流回归 GitHub</li>
-<li>配置 RSS 订阅，不依赖任何平台推送</li>
-<li>持续优化性能，保底 Lighthouse 95+</li>
+<li>把标签系统和分类导航做好</li>
+<li>接上 Giscus 评论，讨论都回到 GitHub 上</li>
+<li>配上 RSS 订阅，不用依赖任何平台推流</li>
+<li>性能继续优化，Lighthouse 分往 95+ 搞</li>
 </ul>
 
-<h2>结语</h2>
+<h2>就这些了</h2>
 
-<p>搭建博客的过程本身就是一次创造。每一行代码、每一处留白、每一个字体选择，都是自我表达的一部分。希望这个小小的数字花园能在未来不断生长，也欢迎每一位路过的读者留下足迹。</p>
-
-<p>感谢你愿意花时间读到这里。我们下一篇文章见。</p>
+<p>搭博客这件事本身就挺有意思的。每一行代码、每一处留白、选的每一个字体，都带着自己的痕迹。希望这个小花园慢慢长起来吧，路过的朋友也欢迎多来看看。</p>
         </div>
       </article>
     </div>

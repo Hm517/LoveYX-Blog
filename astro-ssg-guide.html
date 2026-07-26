@@ -276,22 +276,22 @@
         <div class="article-content">
 <h2>什么是 Static Site Generation</h2>
 
-<p>静态站点生成（SSG）的理念很简单：在构建阶段把所有页面预渲染成 HTML，部署时直接提供静态文件。没有服务器运行时，没有数据库查询，CDN 可以直接缓存所有内容。结果是极致的加载速度和极高的安全性。</p>
+<p>静态站点生成（SSG）的思路挺简单：构建的时候把所有页面预渲染成 HTML，部署直接扔静态文件上去就行了。没有服务器在跑，没有数据库要查，CDN 可以直接缓存全部内容。所以加载飞快，安全也好做。</p>
 
-<p>但传统 SSG 有一个明显缺陷：<strong>每增加一点交互性，就不得不引入大量 JavaScript</strong>。比如一个评论系统或搜索框，往往需要把整个页面变成一个 SPA。</p>
+<p>不过传统 SSG 有个挺头疼的问题：<strong>每加一点交互功能，就得引入一堆 JavaScript</strong>。比如你想加个评论区或者搜索框，往往得把整页搞成 SPA，这就跟 SSG 的理念拧巴了。</p>
 
-<p>Astro 的解决方法就是 <strong>Islands Architecture（群岛架构）</strong>。</p>
+<p>Astro 用 <strong>Islands Architecture（群岛架构）</strong> 来解决这个问题。</p>
 
 <h2>Islands Architecture 详解</h2>
 
-<p>Astro 把页面分为两个区域：</p>
+<p>Astro 把页面拆成两块：</p>
 
 <ul>
-<li><strong>静态海洋</strong>：页面主体内容（文章、导航、页脚），构建时直接渲染为 HTML，客户端零 JS。</li>
-<li><strong>交互岛屿</strong>：需要交互的部分（评论区、主题切换按钮、搜索框），各自独立加载 JavaScript。</li>
+<li><strong>静态海洋</strong>：页面主体内容（文章、导航、页脚），构建时直接渲染成 HTML，客户端零 JS。</li>
+<li><strong>交互岛屿</strong>：需要交互的部分（评论区、主题切换按钮、搜索框），各自独立加载自己的 JS。</li>
 </ul>
 
-<p>这意味着你的博客文章页可能只有评论区那个 3KB 的脚本，文章正文完全是纯 HTML。</p>
+<p>所以你的博客文章页可能只有评论区那 3KB 脚本，文章正文就是纯 HTML。体感上就是秒开。</p>
 
 <pre><code>// 示例：在 Astro 页面中引入交互式组件
 ---
@@ -311,7 +311,7 @@ import ThemeToggle from '../components/ThemeToggle.astro';
 
 <h2>Content Collections：类型安全的 Markdown</h2>
 
-<p>Astro 的 Content Collections 功能是其杀手锏之一。通过 Zod schema 定义 frontmatter 结构，你可以在编辑器中获得自动补全，在构建时捕获元数据错误：</p>
+<p>Content Collections 是我最喜欢 Astro 的地方。用 Zod schema 定义 frontmatter 结构之后，编辑器里能自动补全，构建时元数据错了直接报——再也不会出现文章上线了才发现日期格式不对这种事了。</p>
 
 <pre><code>import { getCollection } from 'astro:content';
 
@@ -327,7 +327,7 @@ const aiPosts = posts.filter(
 
 <h2>路由与动态页面</h2>
 
-<p>Astro 的文件路由极其直观。<code>src/pages/blog/[slug].astro</code> 自动匹配 <code>/blog/hello-world/</code> 这样的路径：</p>
+<p>Astro 的文件路由很直观。<code>src/pages/blog/[slug].astro</code> 自动匹配 <code>/blog/hello-world/</code> 这种路径：</p>
 
 <pre><code>---
 // src/pages/blog/[slug].astro
@@ -351,17 +351,17 @@ const { Content } = await post.render();
 <h2>性能优化建议</h2>
 
 <ul>
-<li><strong>图片优化</strong>：使用 Astro 内置的 <code>&lt;Image /&gt;</code> 组件自动生成 WebP/AVIF 格式</li>
-<li><strong>Font Optimization</strong>：通过 <code>@fontsource</code> 本地化字体，避免 Google Fonts 的额外请求</li>
-<li><strong>Prefetch</strong>：利用 <code>&lt;link rel="prefetch"&gt;</code> 预加载可能的下一页</li>
-<li><strong>View Transitions</strong>：Astro 3.0+ 内置页面过渡动画，SPA 般丝滑</li>
+<li><strong>图片优化</strong>：用 Astro 内置的 <code>&lt;Image /&gt;</code> 组件自动生成 WebP/AVIF 格式</li>
+<li><strong>Font Optimization</strong>：通过 <code>@fontsource</code> 本地化字体，省掉 Google Fonts 的额外请求</li>
+<li><strong>Prefetch</strong>：用 <code>&lt;link rel="prefetch"&gt;</code> 预加载可能的下一页</li>
+<li><strong>View Transitions</strong>：Astro 3.0+ 内置页面过渡动画，体验接近 SPA</li>
 </ul>
 
 <h2>部署到 Cloudflare Pages</h2>
 
-<p>Astro 对 Cloudflare Pages 的支持近乎完美。连接 GitHub 仓库后，设置构建命令 <code>npm run build</code> 和输出目录 <code>dist</code>，每次推送自动部署。免费套餐包含无限带宽和全球 CDN，个人博客完全够用。</p>
+<p>Astro 部署到 Cloudflare Pages 非常省心。连上 GitHub 仓库，构建命令填 <code>npm run build</code>，输出目录设 <code>dist</code>，每次推送自动部署。免费套餐有无限带宽和全球 CDN，个人博客绰绰有余。</p>
 
-<p>Astro 生态还在快速成长。如果你正在考虑搭建下一个静态站点，不妨试试 Astro——它可能会是你用过最愉快的 SSG 框架。</p>
+<p>Astro 的生态还在成长。如果你下一个静态站点还没选定框架，可以试试看——至少搭博客这件事它会让你很舒服。</p>
         </div>
       </article>
     </div>
