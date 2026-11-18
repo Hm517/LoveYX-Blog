@@ -3,313 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog</title>
-<meta name="description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 - LoveYX Blog 个人博客">
-<meta name="theme-color" content="#17191b">
+<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Journal</title>
+<meta name="description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog 个人刊物">
+<meta name="theme-color" content="#faf8f3">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
-<meta property="og:title" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog">
-<meta property="og:description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 - LoveYX Blog 个人博客">
+<meta property="og:title" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Journal">
+<meta property="og:description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog 个人刊物">
 <meta property="og:image" content="apple-touch-icon.png">
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@500;600;700&display=swap');
 
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --ink: #17191b;
-  --ink-soft: #1f2225;
-  --paper: #f7f3ec;
-  --letter: #fdfaf4;
-  --raised: #efe9df;
-  --hair: rgba(31, 28, 25, 0.11);
-  --hair-dark: rgba(255, 255, 255, 0.12);
-  --text: #1f1c19;
-  --secondary: #5d554c;
-  --muted: #847a6f;
-  --on-dark: #f0ebe2;
-  --on-dark-soft: #a8a39c;
-  --accent: #a54f68;
-  --accent-on-dark: #d9a6b4;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --paper:#faf8f3;
+  --paper-2:#f1ede3;
+  --ink:#1c1b18;
+  --ink-soft:#33312c;
+  --secondary:#635e55;
+  --muted:#968f82;
+  --line:#d8d1c4;
+  --seal:#b5372b;
+  --seal-deep:#8e2a20;
+  --mono:'DM Mono','IBM Plex Mono',ui-monospace,monospace;
+  --serif:'Noto Serif SC','Songti SC',serif;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
 }
-html { scroll-behavior: smooth; font-size: 16px; }
-body {
-  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: var(--paper); color: var(--text);
-  line-height: 1.75; overflow-x: hidden;
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.8;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
-@media (max-width: 760px) { .container { padding: 0 20px; } }
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 40px}
+@media(max-width:760px){.wrap{padding:0 22px}}
 
-.masthead { background: var(--ink); color: var(--on-dark); }
-.site-header { border-bottom: 1px solid var(--hair-dark); }
-.header-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  min-height: 72px; gap: 16px;
+/* masthead / edition line */
+.edition{border-bottom:2px solid var(--ink);background:var(--paper)}
+.edition-in{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  min-height:56px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--secondary);
 }
-.wordmark {
-  font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 500;
-  color: var(--on-dark); text-decoration: none; letter-spacing: 0.01em;
-}
-.nav { display: flex; gap: 4px; }
-.nav a {
-  padding: 8px 12px; border-radius: 6px; font-size: 14px;
-  color: var(--on-dark-soft); text-decoration: none;
-  transition: color 140ms var(--ease), background-color 140ms var(--ease);
-}
-.nav a:hover { color: var(--on-dark); background-color: var(--ink-soft); }
-@media (max-width: 560px) { .nav a { padding: 8px; font-size: 13px; } }
-
-.hero { padding: 96px 0 104px; }
-.hero-grid {
-  display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  gap: 72px; align-items: center;
-}
-.hero-grid > * { min-width: 0; }
-.eyebrow {
-  font: 400 12px/16px 'IBM Plex Mono', monospace;
-  color: var(--on-dark-soft); margin-bottom: 28px; letter-spacing: 0.04em;
-}
-.hero h1 {
-  font-family: 'Noto Serif SC', serif; font-size: clamp(36px, 4.8vw, 60px);
-  font-weight: 500; line-height: 1.2; letter-spacing: -0.02em;
-  margin-bottom: 24px; overflow-wrap: anywhere;
-}
-.lede {
-  font-size: 16px; color: var(--on-dark-soft); max-width: 28rem;
-  line-height: 1.85; overflow-wrap: anywhere;
-}
-.stats { display: flex; flex-wrap: wrap; gap: 32px; margin-top: 48px; }
-.stat { display: flex; align-items: baseline; gap: 10px; }
-.stat .num {
-  font: 500 28px/1 'IBM Plex Mono', monospace; color: var(--on-dark);
-  font-variant-numeric: tabular-nums;
-}
-.stat .label { font-size: 12px; color: var(--on-dark-soft); }
-
-.letter {
-  position: relative; background: var(--letter); color: var(--text);
-  border-radius: 4px; padding: 40px 44px 32px;
-  text-decoration: none;
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.16);
-  transform: rotate(-1.1deg);
-}
-.letter::after {
-  content: ''; position: absolute; top: 0; right: 0;
-  width: 0; height: 0;
-  border-style: solid; border-width: 0 30px 30px 0;
-  border-color: transparent #e7dfd3 transparent transparent;
-}
-.letter-kicker {
-  font: 400 12px/16px 'IBM Plex Mono', monospace;
-  color: var(--accent); letter-spacing: 0.04em; margin-bottom: 24px;
-}
-.letter-date {
-  font: 400 12px/16px 'IBM Plex Mono', monospace;
-  color: var(--muted); margin-bottom: 12px;
-}
-.letter h2 {
-  font-family: 'Noto Serif SC', serif; font-size: 26px; font-weight: 500;
-  line-height: 1.42; margin-bottom: 14px;
-}
-.letter-excerpt { font-size: 14px; color: var(--secondary); line-height: 1.8; }
-.letter-foot {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 16px; margin-top: 36px; padding-top: 20px;
-  border-top: 1px solid var(--hair);
-}
-.signature { width: 44px; height: 44px; object-fit: contain; }
-.letter-foot a {
-  font-size: 13px; color: var(--accent); text-decoration: none;
-  display: inline-flex; align-items: center; gap: 8px;
-}
-@media (max-width: 900px) {
-  .hero { padding: 72px 0 80px; }
-  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
-  .letter { max-width: 520px; }
+.edition-brand{font-weight:500;color:var(--ink);font-size:13px;letter-spacing:.14em}
+.edition-mid{color:var(--seal);letter-spacing:.1em}
+.edition-nav{display:flex;gap:22px}
+.edition-nav a{position:relative;padding:4px 0}
+.edition-nav a:hover{color:var(--seal)}
+.edition-nav a.is-active::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--seal)}
+@media(max-width:760px){
+  .edition-in{min-height:auto;padding:14px 0;gap:10px}
+  .edition-mid{display:none}
+  .edition-nav{gap:16px}
 }
 
-.section { padding: 88px 0; }
-.section-head {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: 16px; margin-bottom: 40px;
+/* hero */
+.hero{padding:88px 0 0}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:48px;align-items:start}
+.hero-grid>*{min-width:0}
+.kicker{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--seal);margin-bottom:26px;
 }
-.section-head h2 {
-  font-family: 'Noto Serif SC', serif; font-size: 26px; font-weight: 500;
+.hero h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(46px,7.2vw,92px);line-height:1.12;letter-spacing:-.035em;
 }
-.section-meta {
-  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
+.hero h1 .small{
+  display:block;font-size:.46em;line-height:1.4;
+  font-weight:500;letter-spacing:-.01em;color:var(--secondary);
 }
-.index-list { list-style: none; border-top: 1px solid var(--hair); }
-.index-row {
-  display: grid; grid-template-columns: 104px minmax(0, 1fr) 24px;
-  gap: 24px; align-items: start;
-  padding: 28px 12px 28px 0; border-bottom: 1px solid var(--hair);
-  text-decoration: none; color: inherit;
-  transition: background-color 140ms var(--ease), padding-left 140ms var(--ease);
+.hero h1 .big{display:block;overflow-wrap:anywhere}
+.lede{margin-top:28px;max-width:34rem;font-size:17px;line-height:1.9;color:var(--secondary)}
+.hero-side{display:flex;flex-direction:column;align-items:flex-end;gap:22px;padding-top:8px}
+.seal{
+  width:104px;height:104px;background:var(--seal);border-radius:5px;
+  display:grid;place-items:center;transform:rotate(-8deg);position:relative;
+  box-shadow:0 1px 0 rgba(0,0,0,.08);
 }
-.index-row:hover { background-color: var(--raised); padding-left: 12px; }
-.row-date {
-  font: 400 12px/20px 'IBM Plex Mono', monospace; color: var(--muted);
-  font-variant-numeric: tabular-nums;
+.seal::after{content:'';position:absolute;inset:7px;border:1px solid rgba(250,248,243,.5);border-radius:2px}
+.seal span{font-family:var(--serif);font-size:60px;font-weight:700;color:var(--paper);line-height:1}
+.vert{writing-mode:vertical-rl;font-family:var(--serif);font-size:14px;letter-spacing:.32em;color:var(--muted)}
+.hero-foot{
+  margin-top:72px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;
+  gap:24px;align-items:center;padding:26px 0;
 }
-.row-cat {
-  display: block; font: 400 12px/16px 'IBM Plex Mono', monospace;
-  color: var(--accent); margin-bottom: 8px;
+.stat{display:flex;align-items:baseline;gap:12px}
+.stat b{font-family:var(--mono);font-size:30px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.scroll{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);text-align:right}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-side{flex-direction:row;align-items:center;justify-content:flex-start}
+  .hero-foot{grid-template-columns:repeat(3,1fr)}
+  .scroll{display:none}
 }
-.row-main h3 {
-  font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 500;
-  line-height: 1.5; margin-bottom: 8px;
-}
-.row-main p { font-size: 14px; color: var(--secondary); line-height: 1.75; }
-.row-tags {
-  display: block; margin-top: 12px;
-  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
-}
-.row-arrow { font-size: 18px; color: var(--muted); text-align: right; }
-.index-list > li:first-child .row-main h3 { font-size: 26px; }
-.index-list > li:first-child .row-main p { font-size: 15px; }
-@media (max-width: 640px) {
-  .index-row { grid-template-columns: minmax(0, 1fr) 20px; gap: 12px; }
-  .row-date { grid-column: 1; }
-  .row-main { grid-column: 1; }
-  .row-arrow { grid-column: 2; grid-row: 1 / 3; }
-}
-
-.about { border-top: 1px solid var(--hair); }
-.about-grid {
-  display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px;
-}
-.about-grid h2 {
-  font-family: 'Noto Serif SC', serif; font-size: 24px; font-weight: 500;
-}
-.about-copy p {
-  max-width: 36rem; font-size: 16px; color: var(--secondary); line-height: 1.95;
-}
-.about-copy em {
-  font-family: 'Noto Serif SC', serif; font-style: normal; color: var(--text);
-}
-@media (max-width: 640px) {
-  .about-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media(max-width:560px){
+  .hero{padding-top:56px}
+  .hero-foot{gap:12px}
+  .stat{flex-direction:column;gap:2px}
+  .stat b{font-size:24px}
 }
 
-.site-footer { border-top: 1px solid var(--hair); padding: 32px 0 40px; }
-.footer-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 20px;
+/* archive */
+.section{padding:92px 0}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  margin-bottom:44px;padding-bottom:22px;border-bottom:2px solid var(--ink);
 }
-.site-footer p {
-  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
+.section-head h2{font-family:var(--serif);font-size:38px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.section-head .count{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted)}
+.entries{list-style:none;border-top:1px solid var(--line)}
+.entry{
+  display:grid;grid-template-columns:64px 108px minmax(0,1fr) 40px;
+  gap:20px;align-items:start;padding:26px 0;border-bottom:1px solid var(--line);
+  transition:background-color .18s ease,padding-left .18s ease;
 }
-.footer-links { display: flex; gap: 12px; }
-.footer-links a {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: 6px; color: var(--muted);
-  transition: color 140ms var(--ease), background-color 140ms var(--ease);
-}
-.footer-links a:hover { color: var(--text); background-color: var(--raised); }
-.footer-links svg { width: 16px; height: 16px; stroke: currentColor; }
-
-.article-head { padding: 64px 0 72px; }
-.back-link {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--on-dark-soft); text-decoration: none;
-  margin-bottom: 40px;
-  transition: color 140ms var(--ease);
-}
-.back-link:hover { color: var(--on-dark); }
-.back-link svg { width: 16px; height: 16px; stroke: currentColor; }
-.article-kicker {
-  font: 400 12px/16px 'IBM Plex Mono', monospace;
-  color: var(--accent-on-dark); margin-bottom: 20px;
-}
-.article-head h1 {
-  font-family: 'Noto Serif SC', serif; font-size: clamp(30px, 4.2vw, 48px);
-  font-weight: 500; line-height: 1.32; letter-spacing: -0.015em;
-  max-width: 38rem; overflow-wrap: anywhere;
-}
-.article-tags {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
-}
-.article-tags span {
-  padding: 4px 8px; border: 1px solid var(--hair-dark); border-radius: 4px;
-  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--on-dark-soft);
+.entry:hover{background:var(--paper-2);padding-left:14px}
+.entry-no{font-family:var(--mono);font-size:26px;color:var(--line);font-variant-numeric:tabular-nums;line-height:1.2}
+.entry:hover .entry-no,.entries li:first-child .entry-no{color:var(--seal)}
+.entry-date{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:8px;font-variant-numeric:tabular-nums}
+.entry-main{min-width:0}
+.entry-cat{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--seal);margin-bottom:8px}
+.entry-main h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.45;margin-bottom:7px;letter-spacing:-.01em}
+.entry:hover .entry-main h3{color:var(--seal)}
+.entry-main p{font-size:14px;color:var(--secondary);line-height:1.7}
+.entry-arrow{font-size:20px;color:var(--muted);text-align:right;padding-top:4px;transition:transform .18s ease,color .18s ease}
+.entry:hover .entry-arrow{color:var(--seal);transform:translate(3px,-3px)}
+.entries li:first-child .entry-main h3{font-size:29px}
+@media(max-width:760px){
+  .entry{grid-template-columns:44px minmax(0,1fr);gap:12px}
+  .entry-date{grid-column:2;grid-row:1;padding-top:0}
+  .entry-main{grid-column:2;grid-row:2}
+  .entry-no{grid-column:1;grid-row:1/3;font-size:20px}
+  .entry-arrow{display:none}
 }
 
-.article-body {
-  max-width: 720px; margin: 0 auto; padding: 72px 24px 88px;
-  font-size: 16px; line-height: 1.95;
+/* about */
+.about{border-top:1px solid var(--line);background:var(--paper-2)}
+.about-grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:56px}
+.about-grid h2{font-family:var(--serif);font-size:32px;font-weight:600}
+.about-body p{max-width:38rem;font-family:var(--serif);font-size:19px;line-height:2;color:var(--ink-soft)}
+@media(max-width:760px){.about-grid{grid-template-columns:1fr;gap:22px}}
+
+/* footer */
+.foot{background:var(--ink);color:#e8e3d8;padding:56px 0}
+.foot-grid{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.foot-brand{font-family:var(--serif);font-size:40px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.foot-brand span{color:var(--seal)}
+.foot-meta{margin-top:18px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:#8f8a80;line-height:1.9}
+.foot-links{display:flex;gap:10px}
+.foot-links a{width:36px;height:36px;border:1px solid #45423c;border-radius:4px;display:grid;place-items:center;transition:border-color .18s ease,background-color .18s ease}
+.foot-links a:hover{border-color:var(--seal);background:var(--seal)}
+.foot-links svg{width:16px;height:16px;stroke:currentColor;fill:none}
+@media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:26px}}
+
+/* article */
+.article-head{padding:72px 0 0}
+.back{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--secondary);margin-bottom:48px}
+.back:hover{color:var(--seal)}
+.article-head h1{
+  font-family:var(--serif);font-size:clamp(32px,4.6vw,58px);font-weight:700;
+  line-height:1.28;letter-spacing:-.025em;max-width:44rem;overflow-wrap:anywhere;
 }
-.article-body > * { margin-bottom: 24px; }
-.article-body p { overflow-wrap: anywhere; }
-.article-body h2 {
-  font-family: 'Noto Serif SC', serif; font-size: 25px; font-weight: 500;
-  line-height: 1.5; margin-top: 48px; padding-bottom: 12px;
-  border-bottom: 1px solid var(--hair);
-}
-.article-body h3 {
-  font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 500;
-  margin-top: 40px;
-}
-.article-body h4 { font-size: 16px; font-weight: 500; margin-top: 32px; }
-.article-body strong { font-weight: 500; color: var(--text); }
-.article-body ul, .article-body ol { padding-left: 28px; }
-.article-body li { margin-bottom: 8px; }
-.article-body code {
-  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
-  padding: 2px 6px; border-radius: 4px; background: var(--raised);
-}
-.article-body pre {
-  background: var(--ink); color: var(--on-dark);
-  padding: 24px; border-radius: 6px; overflow-x: auto;
-  font-size: 13px; line-height: 1.75;
-}
-.article-body pre code { background: none; padding: 0; color: inherit; }
-.article-body blockquote {
-  border-left: 2px solid var(--accent); padding: 8px 20px;
-  color: var(--secondary); background: var(--raised); border-radius: 0 4px 4px 0;
-}
-.article-body img { max-width: 100%; border-radius: 4px; }
-.article-end { padding: 0 0 72px; }
-.article-end a {
-  font-size: 13px; color: var(--secondary); text-decoration: none;
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.article-end a:hover { color: var(--accent); }
+.article-tags{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+.article-tags span{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--secondary);border:1px solid var(--line);padding:5px 10px;border-radius:3px}
+.article-rule{margin-top:52px;border:0;border-top:2px solid var(--ink)}
+.article-body{max-width:740px;margin:0 auto;padding:64px 24px 88px;font-size:16.5px;line-height:2;color:var(--ink-soft)}
+.article-body>*+*{margin-top:26px}
+.article-body p{overflow-wrap:anywhere}
+.article-body h2{font-family:var(--serif);font-size:27px;font-weight:600;line-height:1.5;color:var(--ink);margin-top:56px;padding-left:16px;border-left:4px solid var(--seal)}
+.article-body h3{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);margin-top:44px}
+.article-body h4{font-size:17px;font-weight:600;color:var(--ink);margin-top:36px}
+.article-body strong{font-weight:600;color:var(--ink)}
+.article-body ul,.article-body ol{padding-left:28px}
+.article-body li{margin-top:8px}
+.article-body code{font-family:var(--mono);font-size:.88em;background:var(--paper-2);padding:2px 6px;border-radius:3px;color:var(--seal-deep)}
+.article-body pre{background:var(--ink);color:#e8e3d8;padding:24px;border-radius:4px;overflow-x:auto;line-height:1.75}
+.article-body pre code{background:none;color:inherit;padding:0;font-size:13px}
+.article-body blockquote{border-left:3px solid var(--seal);background:var(--paper-2);padding:18px 22px;color:var(--secondary)}
+.article-body img{border-radius:4px}
+.article-tail{max-width:740px;margin:0 auto;padding:0 24px 88px}
+.article-tail a{display:inline-block;border-top:1px solid var(--line);padding-top:28px;width:100%;font-family:var(--mono);font-size:12px;color:var(--seal)}
 
 </style>
 </head>
 <body>
-  <div class="masthead">
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="index.html" class="wordmark">LoveYX Blog</a>
-        <nav class="nav">
-        <a href="index.html">首页</a>
-        <a href="index.html#posts" class="is-active">文章</a>
-        <a href="index.html#about">关于</a>
-        </nav>
-      </div>
-    </header>
-    <section class="article-head">
-      <div class="container">
-        <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>返回首页</a>
-        <p class="article-kicker">杂记 / 2026.07.14</p>
-        <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
-        <div class="article-tags">
+  <div class="edition">
+    <div class="wrap edition-in">
+      <span class="edition-brand">LOVEYX JOURNAL</span>
+      <span class="edition-mid">私人刊物 · 第 006 期 · 二〇二六</span>
+      <nav class="edition-nav">
+      <a href="index.html">首页</a>
+      <a href="index.html#posts" class="is-active">文章</a>
+      <a href="index.html#about">关于</a>
+      </nav>
+    </div>
+  </div>
+  <section class="article-head">
+    <div class="wrap">
+      <a href="index.html" class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>返回目录</a>
+      <span class="kicker">Journal &nbsp;/&nbsp; 2026-07-14</span>
+      <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
+      <div class="article-tags">
           <span>AI</span>
           <span>Prompt</span>
           <span>LLM</span>
-        </div>
       </div>
-    </section>
-  </div>
+      <hr class="article-rule">
+    </div>
+  </section>
 
   <main>
     <article class="article-body">
@@ -394,20 +304,23 @@ a { color: inherit; }
 
 <p>Prompt Engineering 说到底是琢磨模型的「思维方式」——给它清晰的边界、具体的期望、典型的参考，出来的结果自然靠谱。每次跟 AI 对话其实都是在练自己的表达能力，这点挺有意思。</p>
     </article>
-    <div class="container article-end">
-      <a href="index.html"><span aria-hidden="true">←</span> 回到目录</a>
+    <div class="article-tail">
+      <a href="index.html">← 返回目录 · LOVEYX JOURNAL</a>
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <p>&copy; 2026 LoveYX Blog · 碎碎念收集器</p>
-      <div class="footer-links">
-        <a href="https://www.instagram.com/yinezeri/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a>
-        <a href="https://x.com/xiaoniaoh" target="_blank" rel="noopener noreferrer" aria-label="X"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l6.5 7.5L4 20h2l5.5-7 5 7H22l-7-8.5L20 4h-2l-5 6.5L9 4H4z"/></svg></a>
-        <a href="https://www.facebook.com/share/1BdMjhiSPG/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
-        <a href="https://www.tiktok.com/@kwbfcyfxu5" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4h4a5 5 0 01-4 4v4z"/></svg></a>
-        <a href="https://github.com/Hm517/loveyx-blog" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 15 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></a>
+  <footer class="foot">
+    <div class="wrap foot-grid">
+      <div>
+        <div class="foot-brand">LoveYX <span>Journal</span></div>
+        <p class="foot-meta">&copy; 2026 LOVEYX BLOG · 碎碎念收集器<br>SET IN SONG &amp; SANS · MADE WITH QUIET MOMENTS</p>
+      </div>
+      <div class="foot-links">
+        <a href="https://www.instagram.com/yinezeri/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a>
+        <a href="https://x.com/xiaoniaoh" target="_blank" rel="noopener noreferrer" aria-label="X"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l6.5 7.5L4 20h2l5.5-7 5 7H22l-7-8.5L20 4h-2l-5 6.5L9 4H4z"/></svg></a>
+        <a href="https://www.facebook.com/share/1BdMjhiSPG/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="https://www.tiktok.com/@kwbfcyfxu5" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4h4a5 5 0 01-4 4v4z"/></svg></a>
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 15 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></a>
       </div>
     </div>
   </footer>
