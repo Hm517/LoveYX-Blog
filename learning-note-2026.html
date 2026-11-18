@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026 上半年学习总结：在 AI 浪潮中保持清醒 — LoveYX Journal</title>
-<meta name="description" content="2026 上半年学习总结：在 AI 浪潮中保持清醒 — LoveYX Blog 私人刊物">
+<title>这半年我折腾了些什么 — LoveYX Journal</title>
+<meta name="description" content="这半年我折腾了些什么 — LoveYX Blog 私人刊物">
 <meta name="theme-color" content="#171512">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta property="og:title" content="2026 上半年学习总结：在 AI 浪潮中保持清醒 — LoveYX Journal">
-<meta property="og:description" content="2026 上半年学习总结：在 AI 浪潮中保持清醒 — LoveYX Blog 私人刊物">
+<meta property="og:title" content="这半年我折腾了些什么 — LoveYX Journal">
+<meta property="og:description" content="这半年我折腾了些什么 — LoveYX Blog 私人刊物">
 <meta property="og:image" content="images/hero-desk.webp">
 <style>
 
@@ -177,7 +177,7 @@ a{color:inherit;text-decoration:none}
     <div class="wrap art-hero-in">
       <a href="index.html" class="back">&larr; &nbsp;返回目录</a>
       <span class="art-cat">学习</span>
-      <h1>2026 上半年学习总结：在 AI 浪潮中保持清醒</h1>
+      <h1>这半年我折腾了些什么</h1>
       <div class="art-meta"><span>2026-07-17</span><span>By 兮</span></div>
       <div class="art-tags">
           <span>学习</span>
@@ -190,13 +190,13 @@ a{color:inherit;text-decoration:none}
     <article class="art-main">
 <h2>写在前面</h2>
 
-<p>2026 年上半年一下子就过完了。这半年我故意少刷了一些推和文章，把省下来的时间拿去做点实在的事——写代码、做项目、整理笔记。下面就是这半年的回顾。</p>
+<p>上半年咻一下就没了。我给自己定了个小规矩：少刷点推和转发，省下来的时间拿去写点代码、做点项目、把乱七八糟的笔记理一理。回头一看还真干了些东西，就记在这儿。</p>
 
-<h2>Rust：从入门到能写 CLI 工具</h2>
+<h2>Rust：折腾了半年，写了个小工具</h2>
 
-<p>年初开始认真学 Rust。选它倒不是因为什么「最受喜爱的语言」，纯粹是它的所有权系统和借用检查器逼着你去想内存到底该怎么管。</p>
+<p>年初开始正经学 Rust。选它不是因为网上吹的什么「最受欢迎语言」，纯粹是它那个所有权和借用检查器，逼着你老老实实想内存到底归谁管。一开始被折磨得够呛，但确实学到东西。</p>
 
-<p>学习路径大概是：</p>
+<p>大概是这么学过来的：</p>
 
 <ul>
 <li>《The Rust Programming Language》前 15 章精读</li>
@@ -205,7 +205,7 @@ a{color:inherit;text-decoration:none}
 <li>用 Axum 写了个最小化的 REST API</li>
 </ul>
 
-<p>用 Clap 搭 CLI 工具大概长这样：</p>
+<p>拿 Clap 搭的那个小工具，核心大概就这点：</p>
 
 <pre><code>use clap::Parser;
 
@@ -227,28 +227,28 @@ fn main() {
     println!("转换 {} -&gt; {}", cli.input, cli.output);
 }</code></pre>
 
-<p>说起来最大的收获其实不是语法本身。是学完 Rust 之后，看任何语言的代码脑子里都会冒出这几个问题——<strong>数据所有权是谁的？生命周期多久？会不会有数据竞争？</strong> 这个习惯值回票价了。</p>
+<p>说真的，最大的收获不是语法。学完 Rust 之后再看别的代码，脑子里会自己蹦出几个问题：<strong>这数据归谁？能活多久？会不会打架？</strong> 光这个习惯就值回票价了。</p>
 
-<h2>分布式系统理论补课</h2>
+<h2>分布式那点事，补了下理论</h2>
 
-<p>花了一个半月啃了两个主题：</p>
+<p>花了一个半月，啃了两块：</p>
 
 <ul>
-<li><strong>Raft 共识算法</strong>：跟着 MIT 6.824 的 Lab 2 实现了 Raft 核心逻辑。Leader Election、Log Replication、Snapshot 跑了一圈下来，对一致性问题算是有了点实操层面的感觉。</li>
-<li><strong>CAP 定理的工程实践</strong>：理论上 CAP 不可兼得，但工程里往往是「牺牲一点点 C 换 A，或者反过来」。搞懂这个权衡比把定理背下来有用得多。</li>
+<li><strong>Raft</strong>：跟着 MIT 6.824 的 Lab 2 把核心逻辑敲了一遍。选主、复制日志、快照，跑通之后对「一致性」这三个字总算有点手感了。</li>
+<li><strong>CAP</strong>：书上说得死，实际干活儿哪有那么绝对，多半是「这点一致性让一让，换个可用」。弄明白怎么取舍，比背定义管用多了。</li>
 </ul>
 
-<h2>AI Agent 框架调研</h2>
+<h2>Agent 框架，挨个试了试</h2>
 
-<p>上半年也花了不少时间折腾 AI Agent 框架——LangChain、CrewAI、AutoGen 都跑了一遍。说实话，现在的 Agent 框架还非常早期，很多号称「自主决策」的东西，看代码其实就是精心编排的状态机。</p>
+<p>这半年也在 Agent 框架里折腾了一阵，LangChain、CrewAI、AutoGen 都跑了一遍。说句大实话：这玩意儿现在还早，很多吹「自主决策」的，扒开代码一看，就是一堆排好队的状态机。</p>
 
-<p>不过确实搞明白了一件事：Agent 的核心抽象就是 <strong>感知 → 规划 → 执行 → 反馈</strong> 这个循环。框架可以换着花样来，但这个基本模式大概率不会过时。</p>
+<p>不过也真想明白了一件事：所谓的 Agent，核心就是这个圈，<strong>看一眼、想一下、动手、再看看结果</strong>。框架换来换去，这个套路估计短时间内变不了。</p>
 
-<h2>方法论的反思</h2>
+<h2>关于怎么学，想明白一点</h2>
 
-<p>这半年最大的心得就四个字：<strong>深度 &gt; 广度</strong>。我以前特别喜欢「刷」——刷完一门课、刷完一本书，就觉得自己学会了。后来发现那是错觉。现在我更愿意在一个问题上多待几周，直到能用大白话给别人讲清楚才算过。</p>
+<p>这半年最有用的一条：<strong>与其贪多，不如钻透</strong>。我以前老爱「刷」，刷完一门课、刷完一本书，就觉得学会了。后来发现是自欺欺人。现在宁可在一个问题上耗几周，耗到能用大白话讲给别人听，才算真懂。</p>
 
-<p>下半年打算在 Rust 上继续深入，然后把手头 AI Agent 的实践落地成一个能跑的项目。与其焦虑不如动手。</p>
+<p>下半年打算接着啃 Rust，再把手头那些 Agent 的零散试验凑成一个真能跑的东西。焦虑没用，动手最实在。</p>
     </article>
     <div class="art-end"><a href="index.html">&larr; &nbsp;回到目录</a></div>
   </main>
