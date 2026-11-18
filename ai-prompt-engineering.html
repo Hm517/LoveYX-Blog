@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>跟 AI 好好说话的几个小技巧 — LoveYX Journal</title>
-<meta name="description" content="跟 AI 好好说话的几个小技巧 — LoveYX Blog 私人刊物">
+<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Journal</title>
+<meta name="description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog 私人刊物">
 <meta name="theme-color" content="#171512">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta property="og:title" content="跟 AI 好好说话的几个小技巧 — LoveYX Journal">
-<meta property="og:description" content="跟 AI 好好说话的几个小技巧 — LoveYX Blog 私人刊物">
+<meta property="og:title" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Journal">
+<meta property="og:description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog 私人刊物">
 <meta property="og:image" content="images/hero-desk.webp">
 <style>
 
@@ -177,7 +177,7 @@ a{color:inherit;text-decoration:none}
     <div class="wrap art-hero-in">
       <a href="index.html" class="back">&larr; &nbsp;返回目录</a>
       <span class="art-cat">杂记</span>
-      <h1>跟 AI 好好说话的几个小技巧</h1>
+      <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
       <div class="art-meta"><span>2026-07-14</span><span>By 兮</span></div>
       <div class="art-tags">
           <span>AI</span>
@@ -189,21 +189,21 @@ a{color:inherit;text-decoration:none}
 
   <main>
     <article class="art-main">
-<h2>好好说话，AI 才听得懂</h2>
+<h2>为什么 Prompt Engineering 重要</h2>
 
-<p>现在谁手上没用过几个大模型？有意思的是，同样一个模型，有人一问就准，有人追问半天还是牛头不对马嘴。差在哪？就差在你怎么跟它说那句话。</p>
+<p>2026 年，大语言模型已经渗透到日常工作的每个角落。但有意思的是，同样用 GPT-5 或 Claude 4，有的人每次都能拿到精准的结果，有的人反复追问也得不到满意答案。差距就在提示词（Prompt）的设计上。</p>
 
-<p>说穿了没什么玄学，就是几个用顺手了的小技巧。挑了我平时最常用的几个，分享给你。</p>
+<p>说白了 Prompt Engineering 不是什么玄学，就是一套能反复用的技巧。下面是我日常大量使用后觉得真正管用的几个。</p>
 
-<h2>第一招：先给它个身份</h2>
+<h2>技巧一：角色设定决定输出质量</h2>
 
-<p>举个最简单的例子，让它写段产品文案。</p>
+<p>做个最简单的实验——让 LLM 写一段产品文案。</p>
 
-<p><strong>随口一说</strong>：<code>帮我写一段蓝牙耳机的介绍。</code></p>
+<p><strong>差的 Prompt</strong>：<code>帮我写一段蓝牙耳机的介绍。</code></p>
 
-<p><strong>换个说法</strong>：<code>你是一位资深消费电子文案写手，擅长用简洁有力的语言突出产品卖点。请为以下蓝牙耳机撰写一段 150 字以内的产品介绍，目标用户是 25-35 岁的都市白领。</code></p>
+<p><strong>好的 Prompt</strong>：<code>你是一位资深消费电子文案写手，擅长用简洁有力的语言突出产品卖点。请为以下蓝牙耳机撰写一段 150 字以内的产品介绍，目标用户是 25-35 岁的都市白领。</code></p>
 
-<p>这俩出来的东西完全两码事。你给它安了个身份，它自己就照着那个身份的语气、用词、套路来，省了你一大堆解释。</p>
+<p>这俩出来的效果天差地别。角色设定给模型圈了一个「思考框架」，它会自动走那个框架下的语气、用词和结构。</p>
 
 <pre><code># System Prompt 示例
 你是一位资深的 Python 代码审查者（Code Reviewer）。
@@ -213,13 +213,13 @@ a{color:inherit;text-decoration:none}
 - 最后关注代码风格（命名、注释、结构）
 - 每条建议附带修改方案和理由</code></pre>
 
-<h2>第二招：把格式说死</h2>
+<h2>技巧二：结构化输出是必选项</h2>
 
-<p>别光说「给我个结果」。你想要啥样，直接把框子画给它：</p>
+<p>别只说「给我一个结果」。把输出格式讲清楚：</p>
 
-<p><strong>含糊版</strong>：<code>总结这篇文章的要点。</code></p>
+<p><strong>模糊版</strong>：<code>总结这篇文章的要点。</code></p>
 
-<p><strong>说清楚版</strong>：</p>
+<p><strong>结构化版</strong>：</p>
 
 <pre><code>请用以下 JSON 格式输出总结：
 {
@@ -229,11 +229,11 @@ a{color:inherit;text-decoration:none}
   "difficulty": "入门/进阶/专家"
 }</code></pre>
 
-<p>尤其批量跑的时候，格式统一了直接上脚本解析，能省一大堆事。</p>
+<p>批处理的时候，格式一致就能直接写脚本解析，省太多事了。</p>
 
-<h2>第三招：让它一步步算</h2>
+<h2>技巧三：思维链（Chain of Thought）</h2>
 
-<p>碰到要算要推的活儿，直接跟它说「一步步来」：</p>
+<p>需要推理的任务，直接让模型「一步步想」：</p>
 
 <pre><code>prompt = """
 问题：某公司第一季度收入 120 万，成本 80 万。
@@ -247,11 +247,11 @@ a{color:inherit;text-decoration:none}
 4. 计算利润和利润率
 """</code></pre>
 
-<p>这么弄准头高不少，而且你能盯着它的思路走，哪步歪了一眼就能看出来。</p>
+<p>这样不仅准确率上去了，你还能量着它的推理过程，哪里出错了能马上定位。</p>
 
-<h2>第四招：给两个例子，比说一堆强</h2>
+<h2>技巧四：Few-Shot 示例胜过千言万语</h2>
 
-<p>你费劲吧啦描述半天风格，不如直接甩两个例子过去：</p>
+<p>与其长篇描述你要的风格，不如直接给两三个例子：</p>
 
 <pre><code>请将以下技术术语用通俗语言解释，参考示例：
 
@@ -266,9 +266,9 @@ a{color:inherit;text-decoration:none}
 
 现在请解释：微服务架构</code></pre>
 
-<h2>扯两句</h2>
+<h2>实践总结</h2>
 
-<p>说到底，跟 AI 打交道就是在练怎么把话说明白。边界给它划清楚，期待讲具体，再丢两个样子过去，它自然就不跑偏了。有意思的是，聊着聊着你会发现，自己表达都变利索了。</p>
+<p>Prompt Engineering 说到底是琢磨模型的「思维方式」——给它清晰的边界、具体的期望、典型的参考，出来的结果自然靠谱。每次跟 AI 对话其实都是在练自己的表达能力，这点挺有意思。</p>
     </article>
     <div class="art-end"><a href="index.html">&larr; &nbsp;回到目录</a></div>
   </main>
