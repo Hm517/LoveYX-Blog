@@ -3,285 +3,316 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog</title>
+<meta name="description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 - LoveYX Blog 个人博客">
+<meta name="theme-color" content="#17191b">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#a54f68">
-<title>Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog</title>
-<meta name="description" content="分享日常使用大语言模型时积累的 Prompt Engineering 实践心得，涵盖角色设定、结构化输出与思维链技巧。">
+<meta property="og:title" content="Prompt Engineering 实践技巧：让 AI 输出更精准 — LoveYX Blog">
+<meta property="og:description" content="Prompt Engineering 实践技巧：让 AI 输出更精准 - LoveYX Blog 个人博客">
+<meta property="og:image" content="apple-touch-icon.png">
 <style>
 
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap');
 
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --paper: #f6f2eb;
-    --card: #fffdf8;
-    --raised: #efe9df;
-    --hair: rgba(31, 27, 22, 0.10);
-    --hair-strong: rgba(31, 27, 22, 0.18);
-    --text: #1f1b16;
-    --secondary: #5e554a;
-    --muted: #7b7266;
-    --accent: #a54f68;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  html { scroll-behavior: smooth; font-size: 16px; }
-  body {
-    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: var(--paper);
-    color: var(--text);
-    line-height: 1.75;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  a { color: inherit; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --ink: #17191b;
+  --ink-soft: #1f2225;
+  --paper: #f7f3ec;
+  --letter: #fdfaf4;
+  --raised: #efe9df;
+  --hair: rgba(31, 28, 25, 0.11);
+  --hair-dark: rgba(255, 255, 255, 0.12);
+  --text: #1f1c19;
+  --secondary: #5d554c;
+  --muted: #847a6f;
+  --on-dark: #f0ebe2;
+  --on-dark-soft: #a8a39c;
+  --accent: #a54f68;
+  --accent-on-dark: #d9a6b4;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--paper); color: var(--text);
+  line-height: 1.75; overflow-x: hidden;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 760px) { .container { padding: 0 20px; } }
 
-  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; }
-  @media (max-width: 768px) { .container { padding: 0 16px; } }
+.masthead { background: var(--ink); color: var(--on-dark); }
+.site-header { border-bottom: 1px solid var(--hair-dark); }
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 72px; gap: 16px;
+}
+.wordmark {
+  font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 500;
+  color: var(--on-dark); text-decoration: none; letter-spacing: 0.01em;
+}
+.nav { display: flex; gap: 4px; }
+.nav a {
+  padding: 8px 12px; border-radius: 6px; font-size: 14px;
+  color: var(--on-dark-soft); text-decoration: none;
+  transition: color 140ms var(--ease), background-color 140ms var(--ease);
+}
+.nav a:hover { color: var(--on-dark); background-color: var(--ink-soft); }
+@media (max-width: 560px) { .nav a { padding: 8px; font-size: 13px; } }
 
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(246, 242, 235, 0.94);
-    border-bottom: 1px solid var(--hair);
-    backdrop-filter: blur(8px);
-  }
-  .header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 64px; }
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Noto Serif SC', serif;
-    font-size: 17px; font-weight: 500; color: var(--text); text-decoration: none;
-  }
-  .logo-icon { width: 28px; height: 28px; border-radius: 4px; object-fit: contain; }
-  .nav { display: flex; gap: 4px; }
-  .nav a {
-    padding: 8px 12px; border-radius: 6px;
-    font-size: 14px; color: var(--secondary); text-decoration: none;
-    transition: background 140ms var(--ease), color 140ms var(--ease);
-  }
-  .nav a:hover { color: var(--text); background: var(--raised); }
-  @media (max-width: 560px) { .nav a { padding: 8px; font-size: 13px; } }
+.hero { padding: 96px 0 104px; }
+.hero-grid {
+  display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 72px; align-items: center;
+}
+.hero-grid > * { min-width: 0; }
+.eyebrow {
+  font: 400 12px/16px 'IBM Plex Mono', monospace;
+  color: var(--on-dark-soft); margin-bottom: 28px; letter-spacing: 0.04em;
+}
+.hero h1 {
+  font-family: 'Noto Serif SC', serif; font-size: clamp(36px, 4.8vw, 60px);
+  font-weight: 500; line-height: 1.2; letter-spacing: -0.02em;
+  margin-bottom: 24px; overflow-wrap: anywhere;
+}
+.lede {
+  font-size: 16px; color: var(--on-dark-soft); max-width: 28rem;
+  line-height: 1.85; overflow-wrap: anywhere;
+}
+.stats { display: flex; flex-wrap: wrap; gap: 32px; margin-top: 48px; }
+.stat { display: flex; align-items: baseline; gap: 10px; }
+.stat .num {
+  font: 500 28px/1 'IBM Plex Mono', monospace; color: var(--on-dark);
+  font-variant-numeric: tabular-nums;
+}
+.stat .label { font-size: 12px; color: var(--on-dark-soft); }
 
-  .hero { padding: 88px 0 64px; }
-  .hero-inner {
-    max-width: 1080px; margin: 0 auto; width: 100%; min-width: 0;
-    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: 64px; align-items: center;
-  }
-  .hero-copy { min-width: 0; }
-  .hero-inner > * { min-width: 0; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 4px 8px; border: 1px solid var(--hair); border-radius: 4px;
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--secondary);
-    margin-bottom: 28px;
-  }
-  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-  .hero h1 {
-    font-family: 'Noto Serif SC', serif;
-    font-size: clamp(32px, 4.4vw, 52px); font-weight: 500; letter-spacing: -0.02em;
-    line-height: 1.18; margin-bottom: 20px; overflow-wrap: anywhere;
-  }
-  .hero p { font-size: 16px; color: var(--secondary); max-width: 32rem; line-height: 1.8; overflow-wrap: anywhere; }
-  .hero-stats { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 32px; }
-  .hero-stat { display: flex; align-items: baseline; gap: 8px; }
-  .hero-stat .num {
-    font: 500 24px/1 'IBM Plex Mono', monospace;
-    color: var(--text); font-variant-numeric: tabular-nums;
-  }
-  .hero-stat .label { font-size: 12px; color: var(--muted); }
-  .hero-note {
-    width: 100%; min-width: 0;
-    border: 1px solid var(--hair); border-left: 2px solid var(--accent);
-    border-radius: 8px; background: var(--card); padding: 28px;
-  }
-  .hero-note .note-label {
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted); margin: 0 0 20px;
-  }
-  .hero-note .note-date {
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--secondary); margin: 0 0 8px;
-  }
-  .hero-note h2 {
-    font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 500;
-    line-height: 1.4; margin: 0 0 12px;
-  }
-  .hero-note .note-excerpt { font-size: 14px; color: var(--secondary); margin: 0 0 24px; }
-  .hero-note a {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--accent); text-decoration: none;
-  }
-  @media (max-width: 900px) {
-    .hero-inner { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-    .hero p { max-width: 100%; }
-    .hero { padding: 64px 0 48px; }
-  }
+.letter {
+  position: relative; background: var(--letter); color: var(--text);
+  border-radius: 4px; padding: 40px 44px 32px;
+  text-decoration: none;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.16);
+  transform: rotate(-1.1deg);
+}
+.letter::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid; border-width: 0 30px 30px 0;
+  border-color: transparent #e7dfd3 transparent transparent;
+}
+.letter-kicker {
+  font: 400 12px/16px 'IBM Plex Mono', monospace;
+  color: var(--accent); letter-spacing: 0.04em; margin-bottom: 24px;
+}
+.letter-date {
+  font: 400 12px/16px 'IBM Plex Mono', monospace;
+  color: var(--muted); margin-bottom: 12px;
+}
+.letter h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 26px; font-weight: 500;
+  line-height: 1.42; margin-bottom: 14px;
+}
+.letter-excerpt { font-size: 14px; color: var(--secondary); line-height: 1.8; }
+.letter-foot {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; margin-top: 36px; padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.signature { width: 44px; height: 44px; object-fit: contain; }
+.letter-foot a {
+  font-size: 13px; color: var(--accent); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+@media (max-width: 900px) {
+  .hero { padding: 72px 0 80px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .letter { max-width: 520px; }
+}
 
-  .section { padding: 56px 0; }
-  .section-title {
-    font-family: 'Noto Serif SC', serif;
-    font-size: 24px; font-weight: 500; margin-bottom: 32px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .section-title .icon { width: 20px; height: 20px; display: grid; place-items: center; }
-  .section-title .icon svg { width: 18px; height: 18px; stroke: var(--muted); }
+.section { padding: 88px 0; }
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; margin-bottom: 40px;
+}
+.section-head h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 26px; font-weight: 500;
+}
+.section-meta {
+  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
+}
+.index-list { list-style: none; border-top: 1px solid var(--hair); }
+.index-row {
+  display: grid; grid-template-columns: 104px minmax(0, 1fr) 24px;
+  gap: 24px; align-items: start;
+  padding: 28px 12px 28px 0; border-bottom: 1px solid var(--hair);
+  text-decoration: none; color: inherit;
+  transition: background-color 140ms var(--ease), padding-left 140ms var(--ease);
+}
+.index-row:hover { background-color: var(--raised); padding-left: 12px; }
+.row-date {
+  font: 400 12px/20px 'IBM Plex Mono', monospace; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.row-cat {
+  display: block; font: 400 12px/16px 'IBM Plex Mono', monospace;
+  color: var(--accent); margin-bottom: 8px;
+}
+.row-main h3 {
+  font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 500;
+  line-height: 1.5; margin-bottom: 8px;
+}
+.row-main p { font-size: 14px; color: var(--secondary); line-height: 1.75; }
+.row-tags {
+  display: block; margin-top: 12px;
+  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
+}
+.row-arrow { font-size: 18px; color: var(--muted); text-align: right; }
+.index-list > li:first-child .row-main h3 { font-size: 26px; }
+.index-list > li:first-child .row-main p { font-size: 15px; }
+@media (max-width: 640px) {
+  .index-row { grid-template-columns: minmax(0, 1fr) 20px; gap: 12px; }
+  .row-date { grid-column: 1; }
+  .row-main { grid-column: 1; }
+  .row-arrow { grid-column: 2; grid-row: 1 / 3; }
+}
 
-  .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .card {
-    display: flex; flex-direction: column; gap: 12px;
-    padding: 24px; border: 1px solid var(--hair); border-radius: 8px;
-    background: var(--card); text-decoration: none; color: inherit;
-    transition: background 140ms var(--ease), border-color 140ms var(--ease);
-  }
-  .card:hover { background: #fff; border-color: var(--hair-strong); }
-  .card-grid > .card:first-child {
-    grid-column: 1 / -1;
-    display: grid; grid-template-columns: 160px minmax(0, 1fr);
-    column-gap: 32px; align-items: start;
-  }
-  .card-grid > .card:first-child .card-category,
-  .card-grid > .card:first-child .card-meta,
-  .card-grid > .card:first-child .card-tags { grid-column: 1; }
-  .card-grid > .card:first-child h3,
-  .card-grid > .card:first-child > p { grid-column: 2; }
-  .card-grid > .card:first-child h3 { font-size: 24px; }
-  .card-category {
-    width: fit-content; font: 400 12px/16px 'IBM Plex Mono', monospace;
-    color: var(--accent);
-  }
-  .card h3 { font-family: 'Noto Serif SC', serif; font-size: 19px; font-weight: 500; line-height: 1.5; }
-  .card p { font-size: 14px; color: var(--secondary); line-height: 1.7; }
-  .card-meta {
-    display: flex; flex-wrap: wrap; gap: 16px;
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
-  }
-  .card-meta span { display: inline-flex; align-items: center; gap: 6px; }
-  .card-meta svg { width: 14px; height: 14px; stroke: var(--muted); }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
-  .card-tag, .tag {
-    padding: 2px 6px; border: 1px solid var(--hair); border-radius: 4px;
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
-  }
-  .about-card { max-width: 640px; }
-  @media (max-width: 760px) {
-    .card-grid { grid-template-columns: 1fr; }
-    .card-grid > .card:first-child { grid-template-columns: 1fr; gap: 12px; }
-    .card-grid > .card:first-child .card-category,
-    .card-grid > .card:first-child .card-meta,
-    .card-grid > .card:first-child .card-tags,
-    .card-grid > .card:first-child h3,
-    .card-grid > .card:first-child > p { grid-column: 1; }
-  }
+.about { border-top: 1px solid var(--hair); }
+.about-grid {
+  display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px;
+}
+.about-grid h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 24px; font-weight: 500;
+}
+.about-copy p {
+  max-width: 36rem; font-size: 16px; color: var(--secondary); line-height: 1.95;
+}
+.about-copy em {
+  font-family: 'Noto Serif SC', serif; font-style: normal; color: var(--text);
+}
+@media (max-width: 640px) {
+  .about-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}
 
-  .footer { border-top: 1px solid var(--hair); padding: 32px 0; margin-top: 40px; }
-  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-  .footer p { font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted); }
-  .footer-links { display: flex; gap: 12px; }
-  .footer-links a {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border-radius: 6px; color: var(--muted);
-    transition: background 140ms var(--ease), color 140ms var(--ease);
-  }
-  .footer-links a:hover { color: var(--text); background: var(--raised); }
-  .footer-links svg { width: 16px; height: 16px; stroke: currentColor; }
-  .footer-signature { height: 24px; width: auto; vertical-align: middle; opacity: 0.8; }
+.site-footer { border-top: 1px solid var(--hair); padding: 32px 0 40px; }
+.footer-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+.site-footer p {
+  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
+}
+.footer-links { display: flex; gap: 12px; }
+.footer-links a {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 6px; color: var(--muted);
+  transition: color 140ms var(--ease), background-color 140ms var(--ease);
+}
+.footer-links a:hover { color: var(--text); background-color: var(--raised); }
+.footer-links svg { width: 16px; height: 16px; stroke: currentColor; }
 
-  article { padding: 48px 0 72px; }
-  .article-header { margin-bottom: 40px; }
-  .back-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; color: var(--secondary); text-decoration: none;
-    margin-bottom: 28px; padding: 4px 8px; border-radius: 4px;
-    transition: color 140ms var(--ease), background 140ms var(--ease);
-  }
-  .back-link:hover { color: var(--text); background: var(--raised); }
-  .back-link svg { width: 16px; height: 16px; stroke: currentColor; }
-  .category-badge {
-    display: inline-flex; font: 400 12px/16px 'IBM Plex Mono', monospace;
-    color: var(--accent); margin-bottom: 16px;
-  }
-  .article-header h1 {
-    font-family: 'Noto Serif SC', serif; font-size: clamp(28px, 4vw, 40px);
-    font-weight: 500; line-height: 1.28; letter-spacing: -0.01em; margin-bottom: 20px;
-  }
-  .article-meta {
-    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-    font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--muted);
-  }
-  .article-meta span { display: inline-flex; align-items: center; gap: 6px; }
-  .article-meta svg { width: 14px; height: 14px; stroke: var(--muted); }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .article-header::after { content: ''; display: block; width: 32px; height: 2px; background: var(--accent); margin-top: 28px; }
+.article-head { padding: 64px 0 72px; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--on-dark-soft); text-decoration: none;
+  margin-bottom: 40px;
+  transition: color 140ms var(--ease);
+}
+.back-link:hover { color: var(--on-dark); }
+.back-link svg { width: 16px; height: 16px; stroke: currentColor; }
+.article-kicker {
+  font: 400 12px/16px 'IBM Plex Mono', monospace;
+  color: var(--accent-on-dark); margin-bottom: 20px;
+}
+.article-head h1 {
+  font-family: 'Noto Serif SC', serif; font-size: clamp(30px, 4.2vw, 48px);
+  font-weight: 500; line-height: 1.32; letter-spacing: -0.015em;
+  max-width: 38rem; overflow-wrap: anywhere;
+}
+.article-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
+}
+.article-tags span {
+  padding: 4px 8px; border: 1px solid var(--hair-dark); border-radius: 4px;
+  font: 400 12px/16px 'IBM Plex Mono', monospace; color: var(--on-dark-soft);
+}
 
-  .article-content {
-    font-size: 15px; line-height: 1.9;
-    background: var(--card); border: 1px solid var(--hair); border-radius: 12px;
-    padding: 40px 44px;
-  }
-  @media (max-width: 640px) { .article-content { padding: 24px 20px; } }
-  .article-content h2 {
-    font-family: 'Noto Serif SC', serif; font-size: 23px; font-weight: 500;
-    margin: 40px 0 16px; padding-bottom: 8px;
-    border-bottom: 1px solid var(--hair);
-  }
-  .article-content h3 { font-size: 18px; font-weight: 500; margin: 28px 0 12px; }
-  .article-content h4 { font-size: 16px; font-weight: 500; margin: 24px 0 8px; }
-  .article-content p { margin-bottom: 18px; }
-  .article-content strong { color: var(--text); font-weight: 500; }
-  .article-content ul, .article-content ol { margin-bottom: 18px; padding-left: 24px; }
-  .article-content li { margin-bottom: 8px; }
-  .article-content code {
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
-    padding: 2px 6px; border-radius: 4px; background: var(--raised); color: var(--text);
-  }
-  .article-content pre {
-    margin: 20px 0; padding: 20px 24px; background: #f2ede4;
-    border: 1px solid var(--hair); border-radius: 8px; overflow-x: auto;
-    font-size: 13px; line-height: 1.7;
-  }
-  .article-content pre code { background: none; padding: 0; }
-  .article-content blockquote {
-    border-left: 2px solid var(--accent); padding: 12px 20px; margin: 22px 0;
-    background: var(--raised); border-radius: 0 6px 6px 0; color: var(--secondary);
-  }
-  .article-content img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
+.article-body {
+  max-width: 720px; margin: 0 auto; padding: 72px 24px 88px;
+  font-size: 16px; line-height: 1.95;
+}
+.article-body > * { margin-bottom: 24px; }
+.article-body p { overflow-wrap: anywhere; }
+.article-body h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 25px; font-weight: 500;
+  line-height: 1.5; margin-top: 48px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--hair);
+}
+.article-body h3 {
+  font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 500;
+  margin-top: 40px;
+}
+.article-body h4 { font-size: 16px; font-weight: 500; margin-top: 32px; }
+.article-body strong { font-weight: 500; color: var(--text); }
+.article-body ul, .article-body ol { padding-left: 28px; }
+.article-body li { margin-bottom: 8px; }
+.article-body code {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  padding: 2px 6px; border-radius: 4px; background: var(--raised);
+}
+.article-body pre {
+  background: var(--ink); color: var(--on-dark);
+  padding: 24px; border-radius: 6px; overflow-x: auto;
+  font-size: 13px; line-height: 1.75;
+}
+.article-body pre code { background: none; padding: 0; color: inherit; }
+.article-body blockquote {
+  border-left: 2px solid var(--accent); padding: 8px 20px;
+  color: var(--secondary); background: var(--raised); border-radius: 0 4px 4px 0;
+}
+.article-body img { max-width: 100%; border-radius: 4px; }
+.article-end { padding: 0 0 72px; }
+.article-end a {
+  font-size: 13px; color: var(--secondary); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.article-end a:hover { color: var(--accent); }
 
 </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">
-        <img src="images/logo.png" alt="LoveYX" class="logo-icon">
-        LoveYX Blog
-      </a>
-      <nav class="nav">
+  <div class="masthead">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="wordmark">LoveYX Blog</a>
+        <nav class="nav">
         <a href="index.html">首页</a>
-        <a href="index.html#posts">文章</a>
+        <a href="index.html#posts" class="is-active">文章</a>
         <a href="index.html#about">关于</a>
-      </nav>
-    </div>
-  </header>
+        </nav>
+      </div>
+    </header>
+    <section class="article-head">
+      <div class="container">
+        <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>返回首页</a>
+        <p class="article-kicker">杂记 / 2026.07.14</p>
+        <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
+        <div class="article-tags">
+          <span>AI</span>
+          <span>Prompt</span>
+          <span>LLM</span>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <main>
-    <div class="container">
-      <article>
-        <div class="article-header">
-          <a href="index.html" class="back-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-            返回首页
-          </a>
-          <div class="category-badge">杂记</div>
-          <h1>Prompt Engineering 实践技巧：让 AI 输出更精准</h1>
-          <div class="article-meta">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-07-14</span>
-            <span>杂记</span>
-          </div>
-          <div class="tags" style="margin-top: 14px;"><span class="tag">AI</span><span class="tag">Prompt</span><span class="tag">LLM</span></div>
-        </div>
-        <div class="article-content">
+    <article class="article-body">
 <h2>为什么 Prompt Engineering 重要</h2>
 
 <p>2026 年，大语言模型已经渗透到日常工作的每个角落。但有意思的是，同样用 GPT-5 或 Claude 4，有的人每次都能拿到精准的结果，有的人反复追问也得不到满意答案。差距就在提示词（Prompt）的设计上。</p>
@@ -362,30 +393,21 @@
 <h2>实践总结</h2>
 
 <p>Prompt Engineering 说到底是琢磨模型的「思维方式」——给它清晰的边界、具体的期望、典型的参考，出来的结果自然靠谱。每次跟 AI 对话其实都是在练自己的表达能力，这点挺有意思。</p>
-        </div>
-      </article>
+    </article>
+    <div class="container article-end">
+      <a href="index.html"><span aria-hidden="true">←</span> 回到目录</a>
     </div>
   </main>
 
-  <footer class="footer">
+  <footer class="site-footer">
     <div class="container footer-inner">
-      <p>&copy; 2026 LoveYX Blog · 用代码构建数字花园</p>
+      <p>&copy; 2026 LoveYX Blog · 碎碎念收集器</p>
       <div class="footer-links">
-        <a href="https://www.instagram.com/yinezeri/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
-        </a>
-        <a href="https://x.com/xiaoniaoh" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="X (Twitter)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l6.5 7.5L4 20h2l5.5-7 5 7H22l-7-8.5L20 4h-2l-5 6.5L9 4H4z"/></svg>
-        </a>
-        <a href="https://www.facebook.com/share/1BdMjhiSPG/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Facebook">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-        </a>
-        <a href="https://www.tiktok.com/@kwbfcyfxu5" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="TikTok">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 104 4V4h4a5 5 0 01-4 4v4z"/></svg>
-        </a>
-        <a href="https://github.com/Hm517/loveyx-blog" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 15 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-        </a>
+        <a href="https://www.instagram.com/yinezeri/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a>
+        <a href="https://x.com/xiaoniaoh" target="_blank" rel="noopener noreferrer" aria-label="X"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l6.5 7.5L4 20h2l5.5-7 5 7H22l-7-8.5L20 4h-2l-5 6.5L9 4H4z"/></svg></a>
+        <a href="https://www.facebook.com/share/1BdMjhiSPG/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="https://www.tiktok.com/@kwbfcyfxu5" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4h4a5 5 0 01-4 4v4z"/></svg></a>
+        <a href="https://github.com/Hm517/loveyx-blog" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 15 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></a>
       </div>
     </div>
   </footer>
